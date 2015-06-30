@@ -1,0 +1,9 @@
+{
+	"name": "exolnet/laravel-envoy",
+	"description": "Automated deployment template for Laravel Envoy based on Capistrano.",
+	"license": "MIT",
+	"require": {
+		"php": ">=5.4.0",
+		"laravel/envoy": "~1.0"
+	}
+}
