@@ -41,7 +41,7 @@
 	$releasePath  = $releasesPath .'/'. (isset($release) ? $release : date('YmdHis'));
 @endsetup
 
-@servers(['web' => '-A '. $server])
+@servers(['web' => '-A "'. $server.'"'])
 
 @task('deploy:setup')
 	if [ ! -d "{{ $releasesPath }}" ]; then
