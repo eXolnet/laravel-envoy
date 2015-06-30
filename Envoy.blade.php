@@ -23,6 +23,10 @@
 	$linkedDirs   = array_get($config, 'linked_dirs', []);
 	$keepReleases = array_get($config, 'keep_releases', 5);
 	$tmp_dir      = array_get($config, 'tmp_dir', '/tmp');
+	$cmdNpm       = array_get($config, 'cmd_npm', 'npm');
+	$cmdBower     = array_get($config, 'cmd_bower', 'bower');
+	$cmdGrunt     = array_get($config, 'cmd_grunt', 'grunt');
+	$cmdPhp       = array_get($config, 'cmd_php', 'php');
 
 	if ( ! $server) {
 		throw new Exception('Server URL is not defined for environment '. $environment .'.');
@@ -96,7 +100,7 @@
 		rm -Rf "{{ $repoPath }}"
 	fi
 
-	GIT_SSH_COMMAND="ssh -o PasswordAuthentication=no -o StrictHostKeyChecking=no"
+	export GIT_SSH_COMMAND="ssh -o PasswordAuthentication=no -o StrictHostKeyChecking=no"
 
 	git clone -b {{ $repoBranch }} --depth 1 --recursive -q {{ $repoUrl }} "{{ $repoPath }}"
 
@@ -171,17 +175,17 @@
 @task('deploy:vendors')
 	cd "{{ $releasePath }}"
 
-	npm install
-	bower install
-	grunt build:release
+	{{ $cmdNpm }} install
+	{{ $cmdBower }} install
+	{{ $cmdGrunt }} build:release
 
 	if [ ! -f "composer.phar" ]; then
-		wget -nc http://getcomposer.org/composer.phar;
+		{{ $cmdPhp }} -r "readfile('https://getcomposer.org/installer');" | {{ $cmdPhp }};
 	else
-		php composer.phar self-update
+		{{ $cmdPhp }} composer.phar self-update
 	fi
 
-	php composer.phar install --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction
+	{{ $cmdPhp }} composer.phar install --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction
 @endtask
 
 @task('deploy:migrate')
