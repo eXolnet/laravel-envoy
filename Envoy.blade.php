@@ -1,5 +1,11 @@
 @setup
-	$deployConfig = include('app/config/deploy.php');
+	$configFile   = getcwd().'/app/config/deploy.php';
+
+	if ( ! file_exists($configFile)) {
+		throw new Exception('Config file app/config/deploy.php not found.');
+	}
+
+	$deployConfig = include($configFile);
 	$environment  = isset($env) ? $env : array_get($deployConfig, 'default');
 	$beginOn      = microtime(true);
 
@@ -9,7 +15,7 @@
 
 	// Get configuration
 	$server       = array_get($config, 'server');
-	$deployTo     = array_get($config, 'deploy_to');
+	$deployTo     = array_get($config, 'deploy_to', '');
 	$repoUrl      = array_get($config, 'repo_url');
 	$repoBranch   = array_get($config, 'repo_branch', 'master');
 	$repoTree     = array_get($config, 'repo_tree', '');
@@ -17,6 +23,12 @@
 	$linkedDirs   = array_get($config, 'linked_dirs', []);
 	$keepReleases = array_get($config, 'keep_releases', 5);
 	$tmp_dir      = array_get($config, 'tmp_dir', '/tmp');
+
+	if ( ! $server) {
+		throw new Exception('Server URL is not defined for environment '. $environment .'.');
+	} elseif ( ! $repoUrl) {
+		throw new Exception('Repository URL is not defined for environment '. $environment .'.');
+	}
 
 	// Define paths
 	$deployTo     = rtrim($deployTo, '/');
@@ -215,7 +227,7 @@
 
 	if ($task === 'deploy:symlink' && $slack) {
     $channel = array_get($slack, 'channel', '#deployments');
-	
+
 		@slack($slack['url'], $channel, $name .' - Deployed to _'. $environment .'_ after '. round($totalTime, 1) .' sec.')
 	}
 @endafter
