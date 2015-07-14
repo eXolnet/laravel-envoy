@@ -26,6 +26,7 @@
 	$cmdNpm       = array_get($config, 'cmd_npm', 'npm');
 	$cmdBower     = array_get($config, 'cmd_bower', 'bower');
 	$cmdGrunt     = array_get($config, 'cmd_grunt', 'grunt');
+	$cmdWget      = array_get($config, 'cmd_wget', 'wget');
 	$cmdPhp       = array_get($config, 'cmd_php', 'php');
 
 	if ( ! $server) {
@@ -180,7 +181,7 @@
 	{{ $cmdGrunt }} build:release
 
 	if [ ! -f "composer.phar" ]; then
-		{{ $cmdPhp }} -r "readfile('https://getcomposer.org/installer');" | {{ $cmdPhp }};
+		{{ $cmdWget }} -nc https://getcomposer.org/composer.phar
 	else
 		{{ $cmdPhp }} composer.phar self-update
 	fi
