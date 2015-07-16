@@ -1,5 +1,6 @@
 @setup
-	$configFile   = getcwd().'/app/config/deploy.php';
+	$baseCwd      = isset($__current_cwd) ? $__current_cwd : getcwd();
+	$configFile   = $baseCwd.'/app/config/deploy.php';
 
 	if ( ! file_exists($configFile)) {
 		throw new Exception('Config file app/config/deploy.php not found.');
