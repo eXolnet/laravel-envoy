@@ -203,7 +203,7 @@
 			{{ $cmdPhp }} composer.phar self-update
 		fi
 
-		{{ $cmdPhp }} composer.phar install --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction --no-dev
+		{{ $cmdPhp }} composer.phar install --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction
 	fi
 @endtask
 
