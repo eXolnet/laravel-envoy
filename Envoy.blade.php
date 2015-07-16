@@ -80,15 +80,23 @@
 @endtask
 
 @macro('deploy')
+	deploy:starting
 	deploy:check
+	deploy:started
+	deploy:updating
 	deploy:update_code
 	deploy:release
 	deploy:shared
 	deploy:vendors
 	deploy:migrate
 	deploy:compile_assets
+	deploy:updated
+	deploy:publishing
 	deploy:symlink
+	deploy:published
+	deploy:finishing
 	deploy:cleanup
+	deploy:finished
 @endmacro
 
 @macro('deploy:rollback')
@@ -176,17 +184,27 @@
 @task('deploy:vendors')
 	cd "{{ $releasePath }}"
 
-	{{ $cmdNpm }} install
-	{{ $cmdBower }} install
-	{{ $cmdGrunt }} build:release
-
-	if [ ! -f "composer.phar" ]; then
-		{{ $cmdWget }} -nc https://getcomposer.org/composer.phar
-	else
-		{{ $cmdPhp }} composer.phar self-update
+	if [ -f "package.json" ]; then
+		{{ $cmdNpm }} install
 	fi
 
-	{{ $cmdPhp }} composer.phar install --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction
+	if [ -f "bower.json" ]; then
+		{{ $cmdBower }} install
+	fi
+
+	if [ -f "Gruntfile.js" ]; then
+		{{ $cmdGrunt }} build:release
+	fi
+
+	if [ -f "composer.json" ]; then
+		if [ ! -f "composer.phar" ]; then
+			{{ $cmdWget }} -nc https://getcomposer.org/composer.phar
+		else
+			{{ $cmdPhp }} composer.phar self-update
+		fi
+
+		{{ $cmdPhp }} composer.phar install --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction
+	fi
 @endtask
 
 @task('deploy:migrate')
@@ -220,6 +238,38 @@
 @task('backup:restore')
 @endtask
 
+@task('deploy:starting')
+	echo "deploy:starting"
+@endtask
+
+@task('deploy:started')
+	echo "deploy:started"
+@endtask
+
+@task('deploy:updating')
+	echo "deploy:updating"
+@endtask
+
+@task('deploy:updated')
+	echo "deploy:updated"
+@endtask
+
+@task('deploy:publishing')
+	echo "deploy:publishing"
+@endtask
+
+@task('deploy:published')
+	echo "deploy:published"
+@endtask
+
+@task('deploy:finishing')
+	echo "deploy:finishing"
+@endtask
+
+@task('deploy:finished')
+	echo "deploy:finished"
+@endtask
+
 @error
 	if ($task === 'deploy:check') {
 		throw new Exception('Unmet prerequisites to deploy. Have you run deploy:setup?');
@@ -231,7 +281,7 @@
 	$totalTime = $endOn - $beginOn;
 
 	if ($task === 'deploy:symlink' && $slack) {
-    $channel = array_get($slack, 'channel', '#deployments');
+	$channel = array_get($slack, 'channel', '#deployments');
 
 		@slack($slack['url'], $channel, $name .' - Deployed to _'. $environment .'_ after '. round($totalTime, 1) .' sec.')
 	}
