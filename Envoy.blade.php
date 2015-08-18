@@ -89,7 +89,6 @@
 	deploy:release
 	deploy:shared
 	deploy:vendors
-	deploy:migrate
 	deploy:compile_assets
 	deploy:updated
 	deploy:publishing
@@ -206,10 +205,6 @@
 
 		{{ $cmdPhp }} composer.phar install --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction
 	fi
-@endtask
-
-@task('deploy:migrate')
-	cd "{{ $releasePath }}" && php artisan migrate
 @endtask
 
 @task('deploy:compile_assets')
