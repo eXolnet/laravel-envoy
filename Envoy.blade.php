@@ -18,12 +18,12 @@
 	$server       = array_get($config, 'server');
 	$deployTo     = array_get($config, 'deploy_to', '');
 	$repoUrl      = array_get($config, 'repo_url');
-	$repoBranch   = array_get($config, 'repo_branch', 'master');
-	$repoTree     = array_get($config, 'repo_tree', '');
+	$commitHash   = isset($commit) ? $commit : array_get($config, 'commit_hash');
 	$linkedFiles  = array_get($config, 'linked_files', []);
 	$linkedDirs   = array_get($config, 'linked_dirs', []);
 	$keepReleases = array_get($config, 'keep_releases', 5);
 	$tmp_dir      = array_get($config, 'tmp_dir', '/tmp');
+	$cmdGit       = array_get($config, 'cmd_git', 'git');
 	$cmdNpm       = array_get($config, 'cmd_npm', 'npm');
 	$cmdBower     = array_get($config, 'cmd_bower', 'bower');
 	$cmdGrunt     = array_get($config, 'cmd_grunt', 'grunt');
@@ -34,6 +34,8 @@
 		throw new Exception('Server URL is not defined for environment '. $environment .'.');
 	} elseif ( ! $repoUrl) {
 		throw new Exception('Repository URL is not defined for environment '. $environment .'.');
+	} elseif ( ! $commitHash) {
+		throw new Exception('No commit hash/tag was provided. Please provide one using --commit.');
 	}
 
 	// Define paths
@@ -105,16 +107,22 @@
 @endmacro
 
 @task('deploy:update_code')
-	if [ -d "{{ $repoPath }}" ]; then
-		rm -Rf "{{ $repoPath }}"
-	fi
-
 	export GIT_SSH_COMMAND="ssh -o PasswordAuthentication=no -o StrictHostKeyChecking=no"
 
-	git clone -b {{ $repoBranch }} --depth 1 --recursive -q {{ $repoUrl }} "{{ $repoPath }}"
+	if [ -d "{{ $repoPath }}" ]; then
+		cd "{{ $repoPath }}"
+		{{ $cmdGit }} fetch
+	else
+		{{ $cmdGit }} clone {{ $repoUrl }} "{{ $repoPath }}"
+	fi
 
 	cd "{{ $repoPath }}"
-	git rev-list --max-count=1 --abbrev-commit {{ $repoBranch }} > REVISION
+
+	{{ $cmdGit }} checkout -f {{ $commitHash }}
+
+	{{ $cmdGit }} submodule update --init
+
+	{{ $cmdGit }} rev-list --max-count=1 --abbrev-commit HEAD > REVISION
 @endtask
 
 @task('deploy:revert_release')
@@ -277,8 +285,8 @@
 	$totalTime = $endOn - $beginOn;
 
 	if ($task === 'deploy:symlink' && $slack) {
-	$channel = array_get($slack, 'channel', '#deployments');
+		$channel = array_get($slack, 'channel', '#deployments');
 
-		@slack($slack['url'], $channel, $name .' - Deployed to _'. $environment .'_ after '. round($totalTime, 1) .' sec.')
+		@slack($slack['url'], $channel, $name . ' @ ' . $commitHash .' - Deployed to _'. $environment .'_ after '. round($totalTime, 1) .' sec.')
 	}
 @endafter
