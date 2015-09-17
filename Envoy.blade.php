@@ -200,10 +200,6 @@
 		{{ $cmdBower }} install
 	fi
 
-	if [ -f "Gruntfile.js" ]; then
-		{{ $cmdGrunt }} build:release
-	fi
-
 	if [ -f "composer.json" ]; then
 		if [ ! -f "composer.phar" ]; then
 			{{ $cmdWget }} -nc https://getcomposer.org/composer.phar
@@ -216,7 +212,11 @@
 @endtask
 
 @task('deploy:compile_assets')
-	cd "{{ $releasePath }}" && grunt build:release
+	cd "{{ $releasePath }}"
+
+	if [ -f "Gruntfile.js" ]; then
+		{{ $cmdGrunt }} build:release
+	fi
 @endtask
 
 @task('deploy:symlink')
