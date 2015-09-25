@@ -1,9 +1,9 @@
 @setup
-	$baseCwd      = isset($__current_cwd) ? $__current_cwd : getcwd();
-	$configFile   = $baseCwd.'/app/config/deploy.php';
+	$baseCwd    = isset($__current_cwd) ? $__current_cwd : getcwd();
+	$configFile = $baseCwd .'/'. (isset($configFile) ? $configFile : 'app/config/deploy.php');
 
 	if ( ! file_exists($configFile)) {
-		throw new Exception('Config file app/config/deploy.php not found.');
+		throw new Exception('Config file '. $configFile .' not found.');
 	}
 
 	$deployConfig = include($configFile);
@@ -282,6 +282,8 @@
 @error
 	if ($task === 'deploy:check') {
 		throw new Exception('Unmet prerequisites to deploy. Have you run deploy:setup?');
+	} else {
+		throw new Exception('Whoops, looks like something went wrong');
 	}
 @enderror
 
