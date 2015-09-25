@@ -193,21 +193,21 @@
 	cd "{{ $releasePath }}"
 
 	if [ -f "package.json" ]; then
-		{{ $cmdNpm }} install
+		{{ $cmdNpm }} install 2>&1
 	fi
 
 	if [ -f "bower.json" ]; then
-		{{ $cmdBower }} install
+		{{ $cmdBower }} install 2>&1
 	fi
 
 	if [ -f "composer.json" ]; then
 		if [ ! -f "composer.phar" ]; then
-			{{ $cmdWget }} -nc https://getcomposer.org/composer.phar
+			{{ $cmdWget }} -nc https://getcomposer.org/composer.phar 2>&1
 		else
-			{{ $cmdPhp }} composer.phar self-update
+			{{ $cmdPhp }} composer.phar self-update 2>&1
 		fi
 
-		{{ $cmdPhp }} composer.phar install --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction
+		{{ $cmdPhp }} composer.phar install --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction 2>&1
 	fi
 @endtask
 
