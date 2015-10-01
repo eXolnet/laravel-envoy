@@ -244,11 +244,6 @@
 
 @task('deploy:starting')
 	echo "deploy:starting"
-	if ($slack) {
-		$channel = array_get($slack, 'channel', '#deployments');
-
-		@slack($slack['url'], $channel, $name . ' @ ' . $commitHash .' - Deployment to _'. $environment .'_ has been triggered.')
-	}
 @endtask
 
 @task('deploy:started')
