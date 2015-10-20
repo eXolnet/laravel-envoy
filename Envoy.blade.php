@@ -18,6 +18,7 @@
 	$server       = array_get($config, 'server');
 	$deployTo     = array_get($config, 'deploy_to', '');
 	$repoUrl      = array_get($config, 'repo_url');
+	$repoTree     = '/'. trim(array_get($config, 'repo_tree'));
 	$commitHash   = isset($commit) ? $commit : array_get($config, 'commit_hash');
 	$linkedFiles  = array_get($config, 'linked_files', []);
 	$linkedDirs   = array_get($config, 'linked_dirs', []);
@@ -145,7 +146,7 @@
 @endtask
 
 @task('deploy:release')
-	rsync -avz --exclude .git/ "{{ $repoPath }}/" "{{ $releasePath }}"
+	rsync -avz --exclude .git/ "{{ $repoPath }}{{ $repoTree }}/" "{{ $releasePath }}"
 @endtask
 
 @task('deploy:shared')
