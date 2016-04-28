@@ -16,6 +16,7 @@
 
 	// Get configuration
 	$server       = array_get($config, 'server');
+	$sshOptions   = array_get($config, 'ssh_options', '');
 	$deployTo     = array_get($config, 'deploy_to', '');
 	$repoUrl      = array_get($config, 'repo_url');
 	$repoTree     = '/'. trim(array_get($config, 'repo_tree'));
@@ -50,7 +51,7 @@
 	$releasePath  = $releasesPath .'/'. (isset($release) ? $release : date('YmdHis'));
 @endsetup
 
-@servers(['web' => '-A "'. $server .'"'])
+@servers(['web' => '-A '. $sshOptions .' "'. $server .'"'])
 
 @task('deploy:setup')
 	if [ ! -d "{{ $releasesPath }}" ]; then
