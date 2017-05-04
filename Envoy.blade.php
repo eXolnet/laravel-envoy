@@ -25,6 +25,7 @@
 	$tmp_dir      = array_get($config, 'tmp_dir', '/tmp');
 	$cmdGit       = array_get($config, 'cmd_git', 'git');
 	$cmdNpm       = array_get($config, 'cmd_npm', 'npm');
+	$cmdYarn      = array_get($config, 'cmd_npm', 'yarn');
 	$cmdBower     = array_get($config, 'cmd_bower', 'bower');
 	$cmdGrunt     = array_get($config, 'cmd_grunt', 'grunt');
 	$cmdWget      = array_get($config, 'cmd_wget', 'wget');
@@ -193,7 +194,11 @@
 	cd "{{ $releasePath }}"
 
 	if [ -f "package.json" ]; then
-		{{ $cmdNpm }} install 2>&1
+		if [ -f "yarn.lock" ]; then
+			{{ $cmdYarn }} install --verbose --no-progress --non-interactive 2>&1
+		else
+			{{ $cmdNpm }} install 2>&1
+		fi
 	fi
 
 	if [ -f "bower.json" ]; then
