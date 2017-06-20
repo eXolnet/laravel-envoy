@@ -5,12 +5,12 @@ chdir(__DIR__);
 
 $__data['__current_cwd'] = $__current_cwd;
 
-$__container->writeCompiledEnvoyFile(
+$__envoyPath = $__container->writeCompiledEnvoyFile(
 	$__compiler, __DIR__.'/Envoy.blade.php', $__serversOnly
-);
+) ?: getcwd().'/Envoy.php';
 
-include getcwd().'/Envoy.php';
+include $__envoyPath;
 
-@unlink(getcwd().'/Envoy.php');
+@unlink($__envoyPath);
 
 chdir($__current_cwd);
