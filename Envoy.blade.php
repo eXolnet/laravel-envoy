@@ -112,6 +112,8 @@
 	@if (! $commitHash)
 		echo "No commit hash/tag was provided. Please provide one using --commit." 1>&2;
 		exit 1
+	@else
+		echo "Deploying commit {{ $commitHash }}..."
 	@endif
 @endtask
 
