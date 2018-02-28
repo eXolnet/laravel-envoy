@@ -37,8 +37,6 @@
 		throw new Exception('Server URL is not defined for environment '. $environment .'.');
 	} elseif ( ! $repoUrl) {
 		throw new Exception('Repository URL is not defined for environment '. $environment .'.');
-	} elseif ( ! $commitHash) {
-		throw new Exception('No commit hash/tag was provided. Please provide one using --commit.');
 	}
 
 	// Define paths
@@ -52,7 +50,7 @@
 	$releasePath  = $releasesPath .'/'. (isset($release) ? $release : date('YmdHis'));
 @endsetup
 
-@servers(['web' => '-A '. $sshOptions .' "'. $server .'"'])
+@servers(['web' => '-q -A '. $sshOptions .' "'. $server .'"'])
 
 @task('deploy:setup')
 	if [ ! -d "{{ $releasesPath }}" ]; then
@@ -70,22 +68,23 @@
 
 @task('deploy:check')
 	if [ ! -d "{{ $releasesPath }}" ]; then
-		echo "Releases path not found."
+		echo "Releases path not found." 1>&2;
 		exit 1
 	fi
 
 	if [ ! -d "{{ $sharedPath }}" ]; then
-		echo "Shared path not found."
+		echo "Shared path not found." 1>&2;
 		exit 1
 	fi
 
 	if [ ! -d "{{ $backupsPath }}" ]; then
-		echo "Backups path not found."
+		echo "Backups path not found." 1>&2;
 		exit 1
 	fi
 @endtask
 
 @macro('deploy')
+	deploy:assert_commit
 	deploy:starting
 	deploy:check
 	deploy:started
@@ -108,6 +107,13 @@
 	deploy:check
 	deploy:revert_release
 @endmacro
+
+@task('deploy:assert_commit')
+	@if (! $commitHash)
+		echo "No commit hash/tag was provided. Please provide one using --commit." 1>&2;
+		exit 1
+	@endif
+@endtask
 
 @task('deploy:update_code')
 	export GIT_SSH_COMMAND="ssh -o PasswordAuthentication=no -o StrictHostKeyChecking=no"
