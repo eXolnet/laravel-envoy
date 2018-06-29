@@ -33,6 +33,8 @@
 	$cmdWget      = array_get($config, 'cmd_wget', 'wget');
 	$cmdPhp       = array_get($config, 'cmd_php', 'php');
 
+	$additionalComposerFlags = array_get($config, 'additional_composer_flags', '');
+
 	if ( ! $server) {
 		throw new Exception('Server URL is not defined for environment '. $environment .'.');
 	} elseif ( ! $repoUrl) {
@@ -222,7 +224,7 @@
 			{{ $cmdPhp }} composer.phar self-update 2>&1
 		fi
 
-		{{ $cmdPhp }} composer.phar install --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction 2>&1
+		{{ $cmdPhp }} composer.phar install {{ $additionalComposerFlags }} --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction 2>&1
 	fi
 @endtask
 
