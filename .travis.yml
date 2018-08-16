@@ -22,4 +22,5 @@ before_script:
   - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-dist -vvv
 
 script:
+  - composer test
   - composer lint
