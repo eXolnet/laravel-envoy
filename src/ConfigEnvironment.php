@@ -24,6 +24,28 @@ class ConfigEnvironment extends Config
     }
 
     /**
+     * @param string $path
+     * @return string
+     */
+    public function getDeployPath($path = '')
+    {
+        return rtrim($this->get('deploy_to'), '/') . ($path ? '/'. $path : '');
+    }
+
+    /**
+     * @param string|null $path
+     * @return string
+     */
+    public function getDeployReleasePath($path = null)
+    {
+        if (! $path) {
+            $path = date('YmdHis');
+        }
+
+        return $this->getDeployPath('releases/'. $path);
+    }
+
+    /**
      * @return void
      */
     protected function validateConfiguration()

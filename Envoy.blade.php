@@ -6,9 +6,8 @@
     $commitHash   = isset($commit) ? $commit : $environment['commit_hash'];
     $server       = $environment->get('server');
     $sshOptions   = $environment->get('ssh_options', '');
-    $deployTo     = $environment->get('deploy_to', '');
     $repoUrl      = $environment->get('repo_url');
-    $repoTree     = '/'. trim($environment->get('repo_tree'));
+    $repoTree     = $environment->get('repo_tree');
     $linkedFiles  = $environment->get('linked_files', []);
     $linkedDirs   = $environment->get('linked_dirs', []);
     $keepReleases = $environment->get('keep_releases', 5);
@@ -24,14 +23,12 @@
     $additionalComposerFlags = $environment->get('additional_composer_flags', '');
 
     // Define paths
-    $deployTo     = rtrim($deployTo, '/');
-    $repoPath     = $deployTo .'/repo';
-    $currentPath  = $deployTo .'/current';
-    $releasesPath = $deployTo .'/releases';
-    $sharedPath   = $deployTo .'/shared';
-    $backupsPath  = $deployTo .'/backups';
-
-    $releasePath  = $releasesPath .'/'. (isset($release) ? $release : date('YmdHis'));
+    $repoPath     = $environment->getDeployPath('repo');
+    $currentPath  = $environment->getDeployPath('current');
+    $releasesPath = $environment->getDeployPath('releases');
+    $sharedPath   = $environment->getDeployPath('shared');
+    $backupsPath  = $environment->getDeployPath('backups');
+    $releasePath  = $environment->getDeployReleasePath(isset($release) ? $release : null);
 @endsetup
 
 @servers(['web' => '-q -A '. $sshOptions .' "'. $server .'"'])
@@ -140,7 +137,7 @@
 @endtask
 
 @task('deploy:release')
-    rsync -avz --exclude .git/ "{{ $repoPath }}{{ $repoTree }}/" "{{ $releasePath }}"
+    rsync -avz --exclude .git/ "{{ $repoPath }}/{{ trim($repoTree) }}/" "{{ $releasePath }}"
 @endtask
 
 @task('deploy:shared')
