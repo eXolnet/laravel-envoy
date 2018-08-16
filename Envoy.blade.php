@@ -1,45 +1,27 @@
 @setup
-    $baseCwd    = isset($__current_cwd) ? $__current_cwd : getcwd();
-    $configFile = $baseCwd .'/'. (isset($configFile) ? $configFile : 'app/config/deploy.php');
+    $deploy      = new Exolnet\Envoy\ConfigDeploy(get_defined_vars());
+    $environment = $deploy->getEnvironment();
 
-    if ( ! file_exists($configFile)) {
-        throw new Exception('Config file '. $configFile .' not found.');
-    }
+    // Prepare configuration
+    $commitHash   = isset($commit) ? $commit : $environment['commit_hash'];
+    $server       = $environment->get('server');
+    $sshOptions   = $environment->get('ssh_options', '');
+    $deployTo     = $environment->get('deploy_to', '');
+    $repoUrl      = $environment->get('repo_url');
+    $repoTree     = '/'. trim($environment->get('repo_tree'));
+    $linkedFiles  = $environment->get('linked_files', []);
+    $linkedDirs   = $environment->get('linked_dirs', []);
+    $keepReleases = $environment->get('keep_releases', 5);
+    $tmp_dir      = $environment->get('tmp_dir', '/tmp');
+    $cmdGit       = $environment->get('cmd_git', 'git');
+    $cmdNpm       = $environment->get('cmd_npm', 'npm');
+    $cmdYarn      = $environment->get('cmd_npm', 'yarn');
+    $cmdBower     = $environment->get('cmd_bower', 'bower');
+    $cmdGrunt     = $environment->get('cmd_grunt', 'grunt');
+    $cmdWget      = $environment->get('cmd_wget', 'wget');
+    $cmdPhp       = $environment->get('cmd_php', 'php');
 
-    $deployConfig = include($configFile);
-    $environment  = isset($env) ? $env : array_get($deployConfig, 'default');
-    $beginOn      = microtime(true);
-
-    $name   = array_get($deployConfig, 'name', 'untitled');
-    $slack  = array_get($deployConfig, 'slack');
-    $config = array_get($deployConfig['environments'], $environment);
-
-    // Get configuration
-    $server       = array_get($config, 'server');
-    $sshOptions   = array_get($config, 'ssh_options', '');
-    $deployTo     = array_get($config, 'deploy_to', '');
-    $repoUrl      = array_get($config, 'repo_url');
-    $repoTree     = '/'. trim(array_get($config, 'repo_tree'));
-    $commitHash   = isset($commit) ? $commit : array_get($config, 'commit_hash');
-    $linkedFiles  = array_get($config, 'linked_files', []);
-    $linkedDirs   = array_get($config, 'linked_dirs', []);
-    $keepReleases = array_get($config, 'keep_releases', 5);
-    $tmp_dir      = array_get($config, 'tmp_dir', '/tmp');
-    $cmdGit       = array_get($config, 'cmd_git', 'git');
-    $cmdNpm       = array_get($config, 'cmd_npm', 'npm');
-    $cmdYarn      = array_get($config, 'cmd_npm', 'yarn');
-    $cmdBower     = array_get($config, 'cmd_bower', 'bower');
-    $cmdGrunt     = array_get($config, 'cmd_grunt', 'grunt');
-    $cmdWget      = array_get($config, 'cmd_wget', 'wget');
-    $cmdPhp       = array_get($config, 'cmd_php', 'php');
-
-    $additionalComposerFlags = array_get($config, 'additional_composer_flags', '');
-
-    if ( ! $server) {
-        throw new Exception('Server URL is not defined for environment '. $environment .'.');
-    } elseif ( ! $repoUrl) {
-        throw new Exception('Repository URL is not defined for environment '. $environment .'.');
-    }
+    $additionalComposerFlags = $environment->get('additional_composer_flags', '');
 
     // Define paths
     $deployTo     = rtrim($deployTo, '/');
@@ -300,12 +282,11 @@
 @enderror
 
 @after
-    $endOn     = microtime(true);
-    $totalTime = $endOn - $beginOn;
+    if ($task === 'deploy:symlink' && $deploy->has('slack')) {
+        $slackUrl     = $deploy->get('slack.url');
+        $slackChannel = $deploy->get('slack.channel', '#deployments');
+        $slackMessage = $deploy->getName() . ' @ ' . $commitHash .' - Deployed to _'. $environment->getName() .'_ after '. round($deploy->getTimeTotal(), 1) .' sec.';
 
-    if ($task === 'deploy:symlink' && $slack) {
-        $channel = array_get($slack, 'channel', '#deployments');
-
-        @slack($slack['url'], $channel, $name . ' @ ' . $commitHash .' - Deployed to _'. $environment .'_ after '. round($totalTime, 1) .' sec.')
+        @slack($slackUrl, $slackChannel, $slackMessage)
     }
 @endafter

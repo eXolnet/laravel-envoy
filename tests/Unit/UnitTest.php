@@ -13,4 +13,12 @@ abstract class UnitTest extends TestCase
     {
         return realpath(__DIR__ .'/../../Envoy.blade.php');
     }
+
+    /**
+     * @return string
+     */
+    protected function getEnvoyMockPath()
+    {
+        return realpath(__DIR__ .'/../Mock/Envoy.blade.php');
+    }
 }
