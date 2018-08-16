@@ -22,6 +22,11 @@ return [
             'server' => 'user@hostname',
 
             /**
+             * Additional SSH options.
+             */
+            'ssh_options' => '',
+
+            /**
              * The path on the remote server where the application should be deployed.
              */
             'deploy_to' => '/deployment/path',
