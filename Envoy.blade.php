@@ -19,6 +19,7 @@
     $cmdGrunt     = $environment->get('cmd_grunt', 'grunt');
     $cmdWget      = $environment->get('cmd_wget', 'wget');
     $cmdPhp       = $environment->get('cmd_php', 'php');
+    $cmdComposer  = $environment->get('cmd_composer', 'composer');
 
     $additionalComposerFlags = $environment->get('additional_composer_flags', '');
 
@@ -197,13 +198,7 @@
     fi
 
     if [ -f "composer.json" ]; then
-        if [ ! -f "composer.phar" ]; then
-            {{ $cmdWget }} -nc https://getcomposer.org/composer.phar 2>&1
-        else
-            {{ $cmdPhp }} composer.phar self-update 2>&1
-        fi
-
-        {{ $cmdPhp }} composer.phar install {{ $additionalComposerFlags }} --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction 2>&1
+        {{ $cmdComposer }} install {{ $additionalComposerFlags }} --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction 2>&1
     fi
 @endtask
 
