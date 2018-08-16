@@ -1,14 +1,45 @@
 {
-	"name": "exolnet/laravel-envoy",
-	"description": "Automated deployment template for Laravel Envoy based on Capistrano.",
-	"license": "MIT",
-	"require": {
-		"php": ">=5.4.0",
-		"laravel/envoy": "~1.0"
-	},
-	"extra": {
-		"branch-alias": {
-			"dev-master": "0.4-dev"
-		}
-	}
+    "name": "exolnet/laravel-envoy",
+    "description": "Automated deployment template for Laravel Envoy based on Capistrano.",
+    "keywords": [
+        "exolnet",
+        "laravel",
+        "envoy",
+        "deployment",
+        "continuous-deployment",
+        "capistrano"
+    ],
+    "homepage": "https://github.com/eXolnet/laravel-envoy",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexandre D'Eschambeault",
+            "homepage": "https://www.exolnet.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Tom Rochette",
+            "homepage": "https://www.exolnet.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "laravel/envoy": "~1.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.0"
+    },
+    "scripts": {
+        "lint": "vendor/bin/phpcs -p --standard=PSR2 config",
+        "lint-fix": "vendor/bin/phpcbf -p --standard=PSR2 config"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.4-dev"
+        }
+    }
 }
