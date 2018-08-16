@@ -3,7 +3,7 @@
     $environment = $deploy->getEnvironment();
 
     // Prepare configuration
-    $commitHash   = isset($commit) ? $commit : $environment['commit_hash'];
+    $commitHash   = isset($commit) ? $commit : $environment->get('commit_hash');
     $server       = $environment->get('server');
     $sshOptions   = $environment->get('ssh_options', '');
     $repoUrl      = $environment->get('repo_url');
