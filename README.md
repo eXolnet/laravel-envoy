@@ -11,7 +11,7 @@ This repository contains automated deployment template for Laravel Envoy. The de
 
 1. Require this package with composer: `composer require exolnet/laravel-envoy`
 2. Create a `Envoy.blade.php` on your project's root with the following content: `@include('vendor/exolnet/laravel-envoy/init.php')`
-3. Create your deployment configuration in your Laravel project at `app/config/deploy.php`. An example config file is provided in this repository at `config/deploy.php.example`
+3. Create your deployment configuration in your Laravel project at `app/config/deploy.php`. An example config file is provided in this repository at `config/deploy.php`
 4. Setup the deployment folders on your remote host: `vendor/bin/envoy run deploy:setup`
 5. Enjoy!
 
