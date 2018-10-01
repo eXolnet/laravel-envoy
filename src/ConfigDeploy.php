@@ -98,7 +98,7 @@ class ConfigDeploy extends Config
     protected function getDeployConfigurationFile()
     {
         if (isset($this->data['configFile'])) {
-            return $this->data['configFile'];
+            return $this->getBasePath() .'/'. $this->data['configFile'];
         }
 
         return $this->guessDeployConfigurationFile();
