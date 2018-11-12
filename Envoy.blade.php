@@ -1,6 +1,7 @@
 @setup
     $deploy      = new Exolnet\Envoy\ConfigDeploy(get_defined_vars());
     $environment = $deploy->getEnvironment();
+    $fingerprint = sha1($environment->get('server').$environment->get('deploy_to'));
 
     // Prepare configuration
     $commitHash   = isset($commit) ? $commit : $environment->get('commit_hash');
@@ -10,6 +11,8 @@
     $repoTree     = $environment->get('repo_tree');
     $linkedFiles  = $environment->get('linked_files', []);
     $linkedDirs   = $environment->get('linked_dirs', []);
+    $cronJobs     = $environment->get('cron_jobs', null);
+    $cronMailTo   = $environment->get('cron_mailto', '');
     $keepReleases = $environment->get('keep_releases', 5);
     $tmp_dir      = $environment->get('tmp_dir', '/tmp');
     $cmdGit       = $environment->get('cmd_git', 'git');
@@ -79,6 +82,7 @@
     deploy:updated
     deploy:publishing
     deploy:symlink
+    deploy:cronjobs
     deploy:published
     deploy:finishing
     deploy:cleanup
@@ -208,6 +212,31 @@
     if [ -f "Gruntfile.js" ]; then
         {{ $cmdGrunt }} build:release
     fi
+@endtask
+
+@task('deploy:cronjobs')
+    FILE=$(mktemp)
+    crontab -l > $FILE || true
+
+    sed -i '/# EXOLNET-LARAVEL-ENVOY BEGIN {{ $fingerprint }}/,/# EXOLNET-LARAVEL-ENVOY END {{ $fingerprint }}/d' $FILE
+
+    @if (is_array($cronJobs) && count($cronJobs) > 0)
+        echo '# EXOLNET-LARAVEL-ENVOY BEGIN {{ $fingerprint }}' >> $FILE
+        echo 'SHELL="/bin/bash"' >> $FILE
+        echo 'MAILTO="{{ $cronMailTo }}"' >> $FILE
+        @foreach ($cronJobs as $cronJob)
+            echo {{ escapeshellarg($cronJob) }} >> $FILE
+        @endforeach
+        echo '# EXOLNET-LARAVEL-ENVOY END {{ $fingerprint }}' >> $FILE
+    @endif
+
+    if [ -s $FILE ]; then
+        crontab $FILE
+    else
+        crontab -r || true
+    fi
+
+    rm $FILE
 @endtask
 
 @task('deploy:symlink')
