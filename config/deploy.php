@@ -57,6 +57,25 @@ return [
             'linked_dirs' => ['app/storage/cache', 'app/storage/logs', 'app/storage/sessions'],
 
             /**
+             * Listed cronjobs will be installed to the user crontab during deployment.
+             */
+            'cron_jobs' => [
+              // ┌────────────── minute (0 - 59)
+              // │  ┌─────────── hour (0 - 23)
+              // │  │  ┌──────── day of month (1 - 31)
+              // │  │  │  ┌───── month (1 - 12)
+              // │  │  │  │  ┌── day of week (0 - 6) (Sunday = 0 or 7)
+              // │  │  │  │  │
+              // *  *  *  *  *   command
+                '*  *  *  *  *   php /path/to/artisan schedule:run >> /dev/null 2>&1',
+            ],
+
+            /**
+             * Email for cron notifications.
+             */
+            'cron_mailto' => 'user@example.com',
+
+            /**
              * The last n releases are kept for possible rollbacks.
              */
             'keep_releases' => 5,

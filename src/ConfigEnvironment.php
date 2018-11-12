@@ -57,5 +57,9 @@ class ConfigEnvironment extends Config
         if (! $this->get('repo_url')) {
             throw new EnvoyException('Repository URL is not defined for environment '. $this->name);
         }
+
+        if (! $this->get('cron_mailto') && $this->get('cron_jobs')) {
+            throw new EnvoyException('Cron MAILTO is not defined for environment '. $this->name);
+        }
     }
 }
