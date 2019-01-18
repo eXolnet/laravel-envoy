@@ -24,6 +24,14 @@ class ConfigEnvironment extends Config
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
      * @param string $path
      * @return string
      */
