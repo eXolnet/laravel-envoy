@@ -2,78 +2,110 @@
 
 return [
     /**
-     * The name of the application.
+     * @mandatory The name of the application.
      */
     'name' => 'untitled',
 
     /**
-     * The environment to use by default.
+     * @mandatory The environment to use by default.
      */
     'default' => 'production',
 
     /**
-     * Environments/servers definitions
+     * @mandatory Environments definitions.
      */
     'environments' => [
+
         'production' => [
-            /**
-             * SSH url to the server.
-             */
-            'server' => 'user@hostname',
 
             /**
-             * The path on the remote server where the application should be deployed.
+             * @mandatory SSH hostname to use to connect to the server.
              */
-            'deploy_to' => '/deployment/path',
+            'ssh_host' => 'hostname',
 
             /**
-             * URL to the repository.
+             * @mandatory SSH user to use to connect to the server.
              */
-            'repo_url' => 'ssh://git@hostname/repository.git',
+            'ssh_user' => 'user',
 
             /**
-             * The branch name to be deployed from SCM.
+             * @optional Additional SSH options.
              */
-            'repo_branch' => 'master',
+            'ssh_options' => '',
 
             /**
-             * The subtree of the repository to deploy.
+             * @mandatory The path on the remote server where the application should be deployed.
              */
-            'repo_tree' => '',
+            'deploy_path' => '/deployment/path',
 
             /**
-             * Listed files will be symlinked into each release directory during deployment.
+             * @optional The relative path in the project where the assets need to be built.
              */
-            'linked_files' => ['.env.php'],
+            'assets_path' => '',
 
             /**
-             * Listed directories will be symlinked into the release directory during deployment.
+             * @mandatory URL to the repository.
              */
-            'linked_dirs' => ['app/storage/cache', 'app/storage/logs', 'app/storage/sessions'],
+            'repository_url' => 'ssh://git@hostname/repository.git',
 
             /**
-             * The last n releases are kept for possible rollbacks.
+             * @optional Listed files will be symlinked into each release directory.
+             */
+            'linked_files' => ['.env'],
+
+            /**
+             * @optional Listed directories will be symlinked into the release directory.
+             */
+            'linked_dirs' => ['storage/app', 'storage/framework', 'storage/logs'],
+
+            /**
+             * @optional Listed files will be copied from the current release into each release directory.
+             */
+            'copied_files' => [],
+
+            /**
+             * @optional Listed directories will be copied from the current release into the release directory.
+             */
+            'copied_dirs' => ['node_modules', 'vendor'],
+
+            /**
+             * @optional Listed cronjobs will be installed to the user crontab during deployment.
+             */
+            'cron_jobs' => [
+              // ┌────────────── minute (0 - 59)
+              // │  ┌─────────── hour (0 - 23)
+              // │  │  ┌──────── day of month (1 - 31)
+              // │  │  │  ┌───── month (1 - 12)
+              // │  │  │  │  ┌── day of week (0 - 6) (Sunday = 0 or 7)
+              // │  │  │  │  │
+              // *  *  *  *  *   command
+                '*  *  *  *  *   php /path/to/artisan schedule:run >> /dev/null 2>&1',
+            ],
+
+            /**
+             * @optional Email for cron notifications.
+             */
+            'cron_mailto' => 'user@example.com',
+
+            /**
+             * @optional The last n releases are kept for possible rollbacks.
              */
             'keep_releases' => 5,
-
-            /**
-             * Temporary directory used during deployments to store data.
-             */
-            'tmp_dir' => '/tmp',
         ],
     ],
 
     /**
-     * Slack notification configuration on deployment.
+     * @optional Slack notification configuration on deployment.
      */
     'slack' => [
-        /**
-         * Slack URL for notifications.
-         */
-        'url'     => 'https://hooks.slack.com/services/XXXXXX/YYYYYY/ZZZZZZ',
 
         /**
-         * Slack channel where to send notifications.
+         * @mandatory Slack URL for notifications.
+         */
+        'url' => 'https://hooks.slack.com/services/XXXXXX/YYYYYY/ZZZZZZ',
+
+        /**
+         * @optional Slack channel where to send notifications.
          */
         'channel' => '#deployments',
     ],

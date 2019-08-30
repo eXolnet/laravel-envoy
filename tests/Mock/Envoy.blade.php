@@ -1,1 +1,1 @@
-@include('../../init.php')
+@import('../../Envoy.blade.php')
