@@ -15,9 +15,9 @@ class ConfigDeploy extends Config
     ];
 
     /**
-     * @var array
+     * @var \Exolnet\Envoy\ConfigContext
      */
-    protected $data;
+    protected $context;
 
     /**
      * @var float
@@ -29,7 +29,7 @@ class ConfigDeploy extends Config
      */
     public function __construct(array $data = [])
     {
-        $this->data = $data;
+        $this->context = new ConfigContext($data);
         $this->timeStart = microtime(true);
 
         $this->loadDeployConfiguration();
@@ -50,7 +50,7 @@ class ConfigDeploy extends Config
     public function getEnvironment($name = null)
     {
         if (! $name) {
-            $name = array_get($this->data, 'env', $this->config['default']);
+            $name = $this->context->get('env', $this->config['default']);
         }
 
         $config = $this->get('environments.'. $name);
@@ -97,8 +97,8 @@ class ConfigDeploy extends Config
      */
     protected function getDeployConfigurationFile()
     {
-        if (isset($this->data['configFile'])) {
-            return $this->getBasePath() .'/'. $this->data['configFile'];
+        if ($this->context->get('configFile')) {
+            return $this->getBasePath() .'/'. $this->context->get('configFile');
         }
 
         return $this->guessDeployConfigurationFile();
