@@ -75,7 +75,7 @@ class ConfigDeploy extends Config
      */
     protected function getBasePath()
     {
-        return array_get($this->data, '__current_cwd', getcwd());
+        return getcwd();
     }
 
     /**
