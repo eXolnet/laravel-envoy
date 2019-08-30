@@ -3,6 +3,7 @@
 namespace Exolnet\Envoy;
 
 use ArrayAccess;
+use Illuminate\Support\Arr;
 
 abstract class Config implements ArrayAccess
 {
@@ -17,7 +18,7 @@ abstract class Config implements ArrayAccess
      */
     public function has($key)
     {
-        return array_has($this->config, $key);
+        return Arr::has($this->config, $key);
     }
 
     /**
@@ -27,7 +28,7 @@ abstract class Config implements ArrayAccess
      */
     public function get($key, $default = null)
     {
-        return array_get($this->config, $key, $default);
+        return Arr::get($this->config, $key, $default);
     }
 
     /**
@@ -37,7 +38,7 @@ abstract class Config implements ArrayAccess
      */
     public function set($key, $value)
     {
-        array_set($this->config, $key, $value);
+        Arr::set($this->config, $key, $value);
 
         return $this;
     }
@@ -48,7 +49,7 @@ abstract class Config implements ArrayAccess
      */
     public function forget($keys)
     {
-        array_forget($this->config, $keys);
+        Arr::forget($this->config, $keys);
 
         return $this;
     }
