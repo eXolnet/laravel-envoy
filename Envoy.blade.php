@@ -6,30 +6,52 @@
 
 @servers(['web' => $serverString])
 
-@task('setup')
-    export GIT_SSH_COMMAND="ssh -q -o PasswordAuthentication=no -o VerifyHostKeyDNS=yes"
+@task('assert:commit')
+    @if (! $commit)
+        echo "Commit not defined." 1>&2
+        exit 1
+    @else
+        echo "Deploying release {{ $release }} with tree-ish {{ $commit }} to environment {{ $environment->getName() }}..."
+    @endif
+@endtask
 
-    if [ -d "{{ $repoPath }}" ]; then
-        echo "Deleting directory {{ $repoPath }}" 1>&2
-        rm -rf "{{ $repoPath }}"
-    fi
+@macro('backups')
+    backups:list
+@endmacro
 
-    if [ ! -d "{{ $repositoryPath }}" ]; then
-        {{ $cmdGit }} clone --bare "{{ $repositoryUrl }}" "{{ $repositoryPath }}"
-        {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" config advice.detachedHead false
-    fi
+@task('backups:list')
+    ls -1 "{{ $backupsPath }}"
+@endtask
 
-    if [ ! -d "{{ $releasesPath }}" ]; then
-        mkdir -v "{{ $releasesPath }}"
-    fi
+@macro('deploy')
+    assert:commit
+    deploy:starting
+        deploy:check
+        deploy:backup
+    deploy:started
+    deploy:provisioning
+        deploy:fetch
+        deploy:release
+        deploy:link
+        deploy:copy
+        deploy:composer
+        deploy:npm
+    deploy:provisioned
+    deploy:building
+        deploy:build
+    deploy:built
+    deploy:publishing
+        deploy:symlink
+        deploy:publish
+        deploy:cronjobs
+    deploy:published
+    deploy:finishing
+        deploy:cleanup
+    deploy:finished
+@endmacro
 
-    if [ ! -d "{{ $sharedPath }}" ]; then
-        mkdir -v "{{ $sharedPath }}"
-    fi
-
-    if [ ! -d "{{ $backupsPath }}" ]; then
-        mkdir -v "{{ $backupsPath }}"
-    fi
+@task('deploy:starting')
+    true
 @endtask
 
 @task('deploy:check')
@@ -61,54 +83,16 @@
     echo "All checks passed!"
 @endtask
 
-@macro('deploy')
-    assert:commit
-    deploy:starting
-        deploy:check
-        deploy:backup
-    deploy:started
-    deploy:provisioning
-        deploy:fetch
-        deploy:release
-        deploy:link
-        deploy:copy
-        deploy:composer
-        deploy:npm
-    deploy:provisioned
-    deploy:building
-        deploy:build
-    deploy:built
-    deploy:publishing
-        deploy:symlink
-        deploy:publish
-        deploy:cronjobs
-    deploy:published
-    deploy:finishing
-        deploy:cleanup
-    deploy:finished
-@endmacro
+@task('deploy:backup')
+    true
+@endtask
 
-@macro('rollback')
-    deploy:starting
-        deploy:check
-        deploy:backup
-    deploy:started
-    deploy:publishing
-        rollback:symlink
-        deploy:publish
-        deploy:cronjobs
-    deploy:published
-    deploy:finishing
-    deploy:finished
-@endmacro
+@task('deploy:started')
+    true
+@endtask
 
-@task('assert:commit')
-    @if (! $commit)
-        echo "Commit not defined." 1>&2
-        exit 1
-    @else
-        echo "Deploying release {{ $release }} with tree-ish {{ $commit }} to environment {{ $environment->getName() }}..."
-    @endif
+@task('deploy:provisioning')
+    true
 @endtask
 
 @task('deploy:fetch')
@@ -116,24 +100,6 @@
 
     {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" remote set-url origin "{{ $repositoryUrl }}"
     {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" fetch
-@endtask
-
-@task('rollback:symlink')
-    @if (isset($release))
-        RELEASE="{{ $release }}"
-    @else
-        cd "{{ $releasesPath }}"
-        RELEASE=`ls -1d */ | head -n -1 | tail -n 1 | sed "s/\/$//"`
-    @endif
-
-    if [ ! -d "{{ $releasesPath }}/$RELEASE" ]; then
-        echo "Release $RELEASE not found. Could not rollback."
-        exit 1
-    fi
-
-    echo "Linking directory {{ $releasesPath }}/$RELEASE to {{ $currentPath }}"
-
-    ln -sfn "{{ $releasesPath }}/$RELEASE" "{{ $currentPath }}"
 @endtask
 
 @task('deploy:release')
@@ -226,6 +192,14 @@
     @endforeach
 @endtask
 
+@task('deploy:composer')
+    cd "{{ $releasePath }}"
+
+    if [ -f "composer.json" ]; then
+        {{ $cmdComposer }} install {{ $cmdComposerOptions }} --prefer-dist --optimize-autoloader --no-progress --no-interaction --no-suggest
+    fi
+@endtask
+
 @task('deploy:npm')
     cd "{{ $assetsPath }}"
 
@@ -238,12 +212,12 @@
     fi
 @endtask
 
-@task('deploy:composer')
-    cd "{{ $releasePath }}"
+@task('deploy:provisioned')
+    true
+@endtask
 
-    if [ -f "composer.json" ]; then
-        {{ $cmdComposer }} install {{ $cmdComposerOptions }} --prefer-dist --optimize-autoloader --no-progress --no-interaction --no-suggest
-    fi
+@task('deploy:building')
+    true
 @endtask
 
 @task('deploy:build')
@@ -256,6 +230,24 @@
             {{ $cmdNpm }} run production --no-progress
         fi
     fi
+@endtask
+
+@task('deploy:built')
+    true
+@endtask
+
+@task('deploy:publishing')
+    true
+@endtask
+
+@task('deploy:symlink')
+    echo "Linking directory {{ $releasePath }} to {{ $currentPath }}"
+
+    ln -sfn "{{ $releasePath }}" "{{ $currentPath }}"
+@endtask
+
+@task('deploy:publish')
+    true
 @endtask
 
 @task('deploy:cronjobs')
@@ -283,14 +275,12 @@
     rm $FILE
 @endtask
 
-@task('deploy:symlink')
-    echo "Linking directory {{ $releasePath }} to {{ $currentPath }}"
-
-    ln -sfn "{{ $releasePath }}" "{{ $currentPath }}"
+@task('deploy:published')
+    true
 @endtask
 
-@task('releases')
-    ls -1 "{{ $releasesPath }}"
+@task('deploy:finishing')
+    true
 @endtask
 
 @task('deploy:cleanup')
@@ -302,56 +292,81 @@
     done
 @endtask
 
-@task('backups')
-    ls -1 "{{ $backupsPath }}"
-@endtask
-
-@task('deploy:starting')
-    true
-@endtask
-
-@task('deploy:backup')
-    true
-@endtask
-
-@task('deploy:started')
-    true
-@endtask
-
-@task('deploy:provisioning')
-    true
-@endtask
-
-@task('deploy:provisioned')
-    true
-@endtask
-
-@task('deploy:building')
-    true
-@endtask
-
-@task('deploy:built')
-    true
-@endtask
-
-@task('deploy:publishing')
-    true
-@endtask
-
-@task('deploy:publish')
-    true
-@endtask
-
-@task('deploy:published')
-    true
-@endtask
-
-@task('deploy:finishing')
-    true
-@endtask
-
 @task('deploy:finished')
     true
+@endtask
+
+@macro('releases')
+    releases:list
+@endmacro
+
+@task('releases:list')
+    ls -1 "{{ $releasesPath }}"
+@endtask
+
+@macro('rollback')
+    deploy:starting
+        deploy:check
+        deploy:backup
+    deploy:started
+    deploy:publishing
+        rollback:symlink
+        deploy:publish
+        deploy:cronjobs
+    deploy:published
+    deploy:finishing
+    deploy:finished
+@endmacro
+
+@task('rollback:symlink')
+    @if (isset($release))
+        RELEASE="{{ $release }}"
+    @else
+        cd "{{ $releasesPath }}"
+        RELEASE=`ls -1d */ | head -n -1 | tail -n 1 | sed "s/\/$//"`
+    @endif
+
+    if [ ! -d "{{ $releasesPath }}/$RELEASE" ]; then
+        echo "Release $RELEASE not found. Could not rollback."
+        exit 1
+    fi
+
+    echo "Linking directory {{ $releasesPath }}/$RELEASE to {{ $currentPath }}"
+
+    ln -sfn "{{ $releasesPath }}/$RELEASE" "{{ $currentPath }}"
+@endtask
+
+@macro('setup')
+    setup:repository
+    setup:directories
+@endmacro
+
+@task('setup:repository')
+    export GIT_SSH_COMMAND="ssh -q -o PasswordAuthentication=no -o VerifyHostKeyDNS=yes"
+
+    if [ -d "{{ $repoPath }}" ]; then
+        echo "Deleting directory {{ $repoPath }}" 1>&2
+        rm -rf "{{ $repoPath }}"
+    fi
+
+    if [ ! -d "{{ $repositoryPath }}" ]; then
+        {{ $cmdGit }} clone --bare "{{ $repositoryUrl }}" "{{ $repositoryPath }}"
+        {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" config advice.detachedHead false
+    fi
+@endtask
+
+@task('setup:directories')
+    if [ ! -d "{{ $releasesPath }}" ]; then
+        mkdir -v "{{ $releasesPath }}"
+    fi
+
+    if [ ! -d "{{ $sharedPath }}" ]; then
+        mkdir -v "{{ $sharedPath }}"
+    fi
+
+    if [ ! -d "{{ $backupsPath }}" ]; then
+        mkdir -v "{{ $backupsPath }}"
+    fi
 @endtask
 
 @error
