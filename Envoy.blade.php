@@ -1,38 +1,7 @@
 @setup
     $deploy      = new Exolnet\Envoy\ConfigDeploy(get_defined_vars());
     $environment = $deploy->getEnvironment();
-    $fingerprint = sha1($environment->get('server').$environment->get('deploy_to'));
-
-    // Prepare configuration
-    $commitHash   = isset($commit) ? $commit : $environment->get('commit_hash');
-    $server       = $environment->get('server');
-    $sshOptions   = $environment->get('ssh_options', '');
-    $repoUrl      = $environment->get('repo_url');
-    $repoTree     = $environment->get('repo_tree');
-    $linkedFiles  = $environment->get('linked_files', []);
-    $linkedDirs   = $environment->get('linked_dirs', []);
-    $cronJobs     = $environment->get('cron_jobs', null);
-    $cronMailTo   = $environment->get('cron_mailto', '');
-    $keepReleases = $environment->get('keep_releases', 5);
-    $tmp_dir      = $environment->get('tmp_dir', '/tmp');
-    $cmdGit       = $environment->get('cmd_git', 'git');
-    $cmdNpm       = $environment->get('cmd_npm', 'npm');
-    $cmdYarn      = $environment->get('cmd_npm', 'yarn');
-    $cmdBower     = $environment->get('cmd_bower', 'bower');
-    $cmdGrunt     = $environment->get('cmd_grunt', 'grunt');
-    $cmdWget      = $environment->get('cmd_wget', 'wget');
-    $cmdPhp       = $environment->get('cmd_php', 'php');
-    $cmdComposer  = $environment->get('cmd_composer', 'composer');
-
-    $additionalComposerFlags = $environment->get('additional_composer_flags', '');
-
-    // Define paths
-    $repoPath     = $environment->getDeployPath('repo');
-    $currentPath  = $environment->getDeployPath('current');
-    $releasesPath = $environment->getDeployPath('releases');
-    $sharedPath   = $environment->getDeployPath('shared');
-    $backupsPath  = $environment->getDeployPath('backups');
-    $releasePath  = $environment->getDeployReleasePath(isset($release) ? $release : null);
+    extract($environment->extractVariables());
 @endsetup
 
 @servers(['web' => '-q -A '. $sshOptions .' "'. $server .'"'])
