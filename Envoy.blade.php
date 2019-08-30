@@ -4,94 +4,121 @@
     extract($environment->extractVariables());
 @endsetup
 
-@servers(['web' => '-q -A '. $sshOptions .' "'. $server .'"'])
+@servers(['web' => $serverString])
 
-@task('deploy:setup')
+@task('setup')
+    export GIT_SSH_COMMAND="ssh -q -o PasswordAuthentication=no -o VerifyHostKeyDNS=yes"
+
+    if [ -d "{{ $repoPath }}" ]; then
+        echo "Deleting directory {{ $repoPath }}" 1>&2
+        rm -rf "{{ $repoPath }}"
+    fi
+
+    if [ ! -d "{{ $repositoryPath }}" ]; then
+        {{ $cmdGit }} clone --bare "{{ $repositoryUrl }}" "{{ $repositoryPath }}"
+        {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" config advice.detachedHead false
+    fi
+
     if [ ! -d "{{ $releasesPath }}" ]; then
-        mkdir "{{ $releasesPath }}";
+        mkdir -v "{{ $releasesPath }}"
     fi
 
     if [ ! -d "{{ $sharedPath }}" ]; then
-        mkdir "{{ $sharedPath }}";
+        mkdir -v "{{ $sharedPath }}"
     fi
 
     if [ ! -d "{{ $backupsPath }}" ]; then
-        mkdir "{{ $backupsPath }}";
+        mkdir -v "{{ $backupsPath }}"
     fi
 @endtask
 
 @task('deploy:check')
+    if [ ! -d "{{ $repositoryPath }}" ]; then
+        echo "Repository path not found." 1>&2
+        exit 1
+    fi
+
+    if [ "$(git --git-dir {{ $repositoryPath }} rev-parse --is-bare-repository)" != "true" ]; then
+        echo "Repository is not bare." 1>&2
+        exit 1
+    fi
+
     if [ ! -d "{{ $releasesPath }}" ]; then
-        echo "Releases path not found." 1>&2;
+        echo "Releases path not found." 1>&2
         exit 1
     fi
 
     if [ ! -d "{{ $sharedPath }}" ]; then
-        echo "Shared path not found." 1>&2;
+        echo "Shared path not found." 1>&2
         exit 1
     fi
 
     if [ ! -d "{{ $backupsPath }}" ]; then
-        echo "Backups path not found." 1>&2;
+        echo "Backups path not found." 1>&2
         exit 1
     fi
+
+    echo "All checks passed!"
 @endtask
 
 @macro('deploy')
-    deploy:assert_commit
+    assert:commit
     deploy:starting
-    deploy:check
+        deploy:check
+        deploy:backup
     deploy:started
-    deploy:updating
-    deploy:update_code
-    deploy:release
-    deploy:shared
-    deploy:vendors
-    deploy:compile_assets
-    deploy:updated
+    deploy:provisioning
+        deploy:fetch
+        deploy:release
+        deploy:link
+        deploy:copy
+        deploy:composer
+        deploy:npm
+    deploy:provisioned
+    deploy:building
+        deploy:build
+    deploy:built
     deploy:publishing
-    deploy:symlink
-    deploy:cronjobs
+        deploy:symlink
+        deploy:publish
+        deploy:cronjobs
     deploy:published
     deploy:finishing
-    deploy:cleanup
+        deploy:cleanup
     deploy:finished
 @endmacro
 
-@macro('deploy:rollback')
-    deploy:check
-    deploy:revert_release
+@macro('rollback')
+    deploy:starting
+        deploy:check
+        deploy:backup
+    deploy:started
+    deploy:publishing
+        rollback:symlink
+        deploy:publish
+        deploy:cronjobs
+    deploy:published
+    deploy:finishing
+    deploy:finished
 @endmacro
 
-@task('deploy:assert_commit')
-    @if (! $commitHash)
-        echo "No commit hash/tag was provided. Please provide one using --commit." 1>&2;
+@task('assert:commit')
+    @if (! $commit)
+        echo "Commit not defined." 1>&2
         exit 1
     @else
-        echo "Deploying commit {{ $commitHash }}..."
+        echo "Deploying release {{ $release }} with tree-ish {{ $commit }} to environment {{ $environment->getName() }}..."
     @endif
 @endtask
 
-@task('deploy:update_code')
-    export GIT_SSH_COMMAND="ssh -o PasswordAuthentication=no -o StrictHostKeyChecking=no"
+@task('deploy:fetch')
+    export GIT_SSH_COMMAND="ssh -q -o PasswordAuthentication=no -o VerifyHostKeyDNS=yes"
 
-    if [ -d "{{ $repoPath }}" ]; then
-        cd "{{ $repoPath }}"
-        {{ $cmdGit }} fetch
-    else
-        {{ $cmdGit }} clone {{ $repoUrl }} "{{ $repoPath }}"
-    fi
-
-    cd "{{ $repoPath }}"
-
-    {{ $cmdGit }} checkout -f {{ $commitHash }}
-
-    {{ $cmdGit }} submodule update --init
-
-    {{ $cmdGit }} rev-list --max-count=1 --abbrev-commit HEAD > REVISION
+    {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" remote set-url origin "{{ $repositoryUrl }}"
+    {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" fetch
 @endtask
 
-@task('deploy:revert_release')
+@task('rollback:symlink')
     @if (isset($release))
         RELEASE="{{ $release }}"
     @else
@@ -99,48 +126,57 @@
         RELEASE=`ls -1d */ | head -n -1 | tail -n 1 | sed "s/\/$//"`
     @endif
 
-    if [ ! -d "{{ $repoPath }}" ]; then
+    if [ ! -d "{{ $releasesPath }}/$RELEASE" ]; then
         echo "Release $RELEASE not found. Could not rollback."
         exit 1
     fi
 
-    echo "Rollback to release $RELEASE"
-    echo "TODO — Rollback migrations"
+    echo "Linking directory {{ $releasesPath }}/$RELEASE to {{ $currentPath }}"
 
     ln -sfn "{{ $releasesPath }}/$RELEASE" "{{ $currentPath }}"
 @endtask
 
 @task('deploy:release')
-    rsync -avz --exclude .git/ "{{ $repoPath }}/{{ trim($repoTree) }}/" "{{ $releasePath }}"
+    mkdir "{{ $releasePath }}"
+    cd "{{ $releasePath }}"
+
+    {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" --work-tree "{{ $releasePath }}" checkout -f {{ $commit }}
+    {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" --work-tree "{{ $releasePath }}" rev-parse HEAD > "{{ $releasePath }}/REVISION"
 @endtask
 
-@task('deploy:shared')
-    @run('deploy:shared:dirs')
-    @run('deploy:shared:files')
+@task('deploy:link')
+    @run('deploy:link:dirs')
+    @run('deploy:link:files')
 @endtask
 
-@task('deploy:shared:dirs')
+@task('deploy:link:dirs')
     @foreach ($linkedDirs as $dir)
+        echo "Linking directory {{ $releasePath }}/{{ $dir }} to {{ $sharedPath }}/{{ $dir }}"
+
         mkdir -p `dirname "{{ $sharedPath }}/{{ $dir }}"`
 
         if [ -d "{{ $releasePath }}/{{ $dir }}" ]; then
             if [ ! -d "{{ $sharedPath }}/{{ $dir }}" ]; then
-                cp -R "{{ $releasePath }}/{{ $dir }}" "{{ $sharedPath }}/{{ $dir }}"
+                cp -r "{{ $releasePath }}/{{ $dir }}" "{{ $sharedPath }}/{{ $dir }}"
             fi
 
-            rm -Rf "{{ $releasePath }}/{{ $dir }}"
+            rm -rf "{{ $releasePath }}/{{ $dir }}"
         fi
 
-        mkdir -p "{{ $sharedPath }}/{{ $dir }}"
+        if [ ! -d "{{ $sharedPath }}/{{ $dir }}" ]; then
+            mkdir "{{ $sharedPath }}/{{ $dir }}"
+        fi
 
         mkdir -p `dirname "{{ $releasePath }}/{{ $dir }}"`
 
-        ln -nfs "{{ $sharedPath }}/{{ $dir }}" "{{ $releasePath }}/{{ $dir }}"
+        ln -sfn "{{ $sharedPath }}/{{ $dir }}" "{{ $releasePath }}/{{ $dir }}"
     @endforeach
 @endtask
 
-@task('deploy:shared:files')
+@task('deploy:link:files')
     @foreach ($linkedFiles as $file)
+        echo "Linking file {{ $releasePath }}/{{ $file }} to {{ $sharedPath }}/{{ $file }}"
+
         mkdir -p `dirname "{{ $sharedPath }}/{{ $file }}"`
 
         if [ -f "{{ $releasePath }}/{{ $file }}" ]; then
@@ -151,35 +187,74 @@
             rm -f "{{ $releasePath }}/{{ $file }}"
         fi
 
-        ln -nfs "{{ $sharedPath }}/{{ $file }}" "{{ $releasePath }}/{{ $file }}"
+        if [ ! -f "{{ $sharedPath }}/{{ $file }}" ]; then
+            touch "{{ $sharedPath }}/{{ $file }}"
+        fi
+
+        mkdir -p `dirname "{{ $releasePath }}/{{ $file }}"`
+
+        ln -sfn "{{ $sharedPath }}/{{ $file }}" "{{ $releasePath }}/{{ $file }}"
     @endforeach
 @endtask
 
-@task('deploy:vendors')
-    cd "{{ $releasePath }}"
+@task('deploy:copy')
+    @run('deploy:copy:dirs')
+    @run('deploy:copy:files')
+@endtask
+
+@task('deploy:copy:dirs')
+    @foreach ($copiedDirs as $dir)
+        echo "Copying directory {{ $currentPath }}/{{ $dir }} to {{ $releasePath }}/{{ $dir }}"
+
+        mkdir -p `dirname "{{ $releasePath }}/{{ $dir }}"`
+
+        if [ -d "{{ $currentPath }}/{{ $dir }}" ]; then
+            rsync -a "{{ $currentPath }}/{{ $dir ? rtrim($dir, '/') .'/' : '' }}" "{{ $releasePath }}/{{ $dir }}"
+        fi
+    @endforeach
+@endtask
+
+@task('deploy:copy:files')
+    @foreach ($copiedFiles as $file)
+        echo "Copying file {{ $currentPath }}/{{ $file }} to {{ $releasePath }}/{{ $file }}"
+
+        mkdir -p `dirname "{{ $releasePath }}/{{ $file }}"`
+
+        if [ -f "{{ $currentPath }}/{{ $file }}" ]; then
+            rsync -a "{{ $currentPath }}/{{ $file }}" "{{ $releasePath }}/{{ $file }}"
+        fi
+    @endforeach
+@endtask
+
+@task('deploy:npm')
+    cd "{{ $assetsPath }}"
 
     if [ -f "package.json" ]; then
         if [ -f "yarn.lock" ]; then
-            {{ $cmdYarn }} install --verbose --no-progress --non-interactive 2>&1
+            {{ $cmdYarn }} install --no-progress --non-interactive
         else
-            {{ $cmdNpm }} install 2>&1
+            {{ $cmdNpm }} install
         fi
-    fi
-
-    if [ -f "bower.json" ]; then
-        {{ $cmdBower }} install 2>&1
-    fi
-
-    if [ -f "composer.json" ]; then
-        {{ $cmdComposer }} install {{ $additionalComposerFlags }} --verbose --prefer-dist --optimize-autoloader --no-progress --no-interaction 2>&1
     fi
 @endtask
 
-@task('deploy:compile_assets')
+@task('deploy:composer')
     cd "{{ $releasePath }}"
 
-    if [ -f "Gruntfile.js" ]; then
-        {{ $cmdGrunt }} build:release
+    if [ -f "composer.json" ]; then
+        {{ $cmdComposer }} install {{ $cmdComposerOptions }} --prefer-dist --optimize-autoloader --no-progress --no-interaction --no-suggest
+    fi
+@endtask
+
+@task('deploy:build')
+    cd "{{ $assetsPath }}"
+
+    if [ -f "package.json" ]; then
+        if [ -f "yarn.lock" ]; then
+            {{ $cmdYarn }} run production --no-progress
+        else
+            {{ $cmdNpm }} run production --no-progress
+        fi
     fi
 @endtask
 
@@ -209,74 +284,92 @@
 @endtask
 
 @task('deploy:symlink')
+    echo "Linking directory {{ $releasePath }} to {{ $currentPath }}"
+
     ln -sfn "{{ $releasePath }}" "{{ $currentPath }}"
 @endtask
 
-@task('deploy:releases')
-    ls "{{ $releasesPath }}"
+@task('releases')
+    ls -1 "{{ $releasesPath }}"
 @endtask
 
 @task('deploy:cleanup')
     cd "{{ $releasesPath }}"
-    ls -1d */ | head -n -{{ $keepReleases }} | xargs -d "\n" rm -Rf
+
+    for RELEASE in $(ls -1d * | head -n -{{ $keepReleases }}); do
+        echo "Deleting old release $RELEASE"
+        rm -rf "$RELEASE"
+    done
 @endtask
 
-@task('backup:create')
-@endtask
-
-@task('backup:list')
-    ls "{{ $backupsPath }}"
-@endtask
-
-@task('backup:restore')
+@task('backups')
+    ls -1 "{{ $backupsPath }}"
 @endtask
 
 @task('deploy:starting')
-    echo "deploy:starting"
+    true
+@endtask
+
+@task('deploy:backup')
+    true
 @endtask
 
 @task('deploy:started')
-    echo "deploy:started"
+    true
 @endtask
 
-@task('deploy:updating')
-    echo "deploy:updating"
+@task('deploy:provisioning')
+    true
 @endtask
 
-@task('deploy:updated')
-    echo "deploy:updated"
+@task('deploy:provisioned')
+    true
+@endtask
+
+@task('deploy:building')
+    true
+@endtask
+
+@task('deploy:built')
+    true
 @endtask
 
 @task('deploy:publishing')
-    echo "deploy:publishing"
+    true
+@endtask
+
+@task('deploy:publish')
+    true
 @endtask
 
 @task('deploy:published')
-    echo "deploy:published"
+    true
 @endtask
 
 @task('deploy:finishing')
-    echo "deploy:finishing"
+    true
 @endtask
 
 @task('deploy:finished')
-    echo "deploy:finished"
+    true
 @endtask
 
 @error
-    if ($task === 'deploy:check') {
-        throw new Exception('Unmet prerequisites to deploy. Have you run deploy:setup?');
+    if ($task === 'assert:commit') {
+        throw new Exception("No tree-ish specified to deploy. Please provide one using '--commit=tree-ish'.");
+    } elseif ($task === 'deploy:check') {
+        throw new Exception("Unmet prerequisites to deploy. Have you run 'deploy:setup' ?");
     } else {
-        throw new Exception('Whoops, looks like something went wrong');
+        throw new Exception('Whoops, looks like something went wrong.');
     }
 @enderror
 
-@after
-    if ($task === 'deploy:symlink' && $deploy->has('slack')) {
+@finished
+    if ($deploy->has('slack')) {
         $slackUrl     = $deploy->get('slack.url');
         $slackChannel = $deploy->get('slack.channel', '#deployments');
-        $slackMessage = $deploy->getName() . ' @ ' . $commitHash .' - Deployed to _'. $environment->getName() .'_ after '. round($deploy->getTimeTotal(), 1) .' sec.';
+        $slackMessage = $deploy->getName() . ' @ ' . $commit .' - Deployed to _'. $environment->getName() .'_ after '. round($deploy->getTimeTotal(), 1) .' sec.';
 
         @slack($slackUrl, $slackChannel, $slackMessage)
     }
-@endafter
+@endfinished
