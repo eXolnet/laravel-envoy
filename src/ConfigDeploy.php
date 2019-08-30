@@ -59,7 +59,7 @@ class ConfigDeploy extends Config
             throw new EnvoyException('No valid configuration found for environment '. $name);
         }
 
-        return new ConfigEnvironment($name, $config);
+        return new ConfigEnvironment($name, $config, $this->context);
     }
 
     /**

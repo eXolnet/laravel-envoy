@@ -12,15 +12,43 @@ class ConfigEnvironment extends Config
     protected $name;
 
     /**
-     * @param string $name
-     * @param array $config
+     * @var string
      */
-    public function __construct($name, array $config)
+    protected $release;
+
+    /**
+     * @var \Exolnet\Envoy\ConfigContext
+     */
+    protected $context;
+
+    /**
+     * @param string                       $name
+     * @param array                        $config
+     * @param \Exolnet\Envoy\ConfigContext $context
+     */
+    public function __construct($name, array $config, $context)
     {
         $this->name = $name;
         $this->config = $config;
+        $this->context = $context;
+
+        $this->set('release', date('YmdHis'));
+
+        $this->overrideConfiguration();
 
         $this->validateConfiguration();
+    }
+
+    /**
+     * @return void
+     */
+    protected function overrideConfiguration()
+    {
+        $this->override('release', $this->context->get('release'));
+        $this->override('commit', $this->context->get('commit'));
+        $this->override('ssh_host', $this->context->get('ssh-host'));
+        $this->override('ssh_user', $this->context->get('ssh-user'));
+        $this->override('deploy_path', $this->context->get('deploy-path'));
     }
 
     /**

@@ -44,6 +44,20 @@ abstract class Config implements ArrayAccess
     }
 
     /**
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function override($key, $value)
+    {
+        if ($value != null) {
+            Arr::set($this->config, $key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param array|string $keys
      * @return $this
      */
