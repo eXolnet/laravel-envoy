@@ -2,62 +2,74 @@
 
 return [
     /**
-     * The name of the application.
+     * @mandatory The name of the application.
      */
     'name' => 'untitled',
 
     /**
-     * The environment to use by default.
+     * @mandatory The environment to use by default.
      */
     'default' => 'production',
 
     /**
-     * Environments/servers definitions
+     * @mandatory Environments definitions.
      */
     'environments' => [
+
         'production' => [
-            /**
-             * SSH url to the server.
-             */
-            'server' => 'user@hostname',
 
             /**
-             * Additional SSH options.
+             * @mandatory SSH hostname to use to connect to the server.
+             */
+            'ssh_host' => 'hostname',
+
+            /**
+             * @mandatory SSH user to use to connect to the server.
+             */
+            'ssh_user' => 'user',
+
+            /**
+             * @optional Additional SSH options.
              */
             'ssh_options' => '',
 
             /**
-             * The path on the remote server where the application should be deployed.
+             * @mandatory The path on the remote server where the application should be deployed.
              */
-            'deploy_to' => '/deployment/path',
+            'deploy_path' => '/deployment/path',
 
             /**
-             * URL to the repository.
+             * @optional The relative path in the project where the assets need to be built.
              */
-            'repo_url' => 'ssh://git@hostname/repository.git',
+            'assets_path' => '',
 
             /**
-             * The branch name to be deployed from SCM.
+             * @mandatory URL to the repository.
              */
-            'repo_branch' => 'master',
+            'repository_url' => 'ssh://git@hostname/repository.git',
 
             /**
-             * The subtree of the repository to deploy.
+             * @optional Listed files will be symlinked into each release directory.
              */
-            'repo_tree' => '',
+            'linked_files' => ['.env'],
 
             /**
-             * Listed files will be symlinked into each release directory during deployment.
+             * @optional Listed directories will be symlinked into the release directory.
              */
-            'linked_files' => ['.env.php'],
+            'linked_dirs' => ['storage/app', 'storage/framework', 'storage/logs'],
 
             /**
-             * Listed directories will be symlinked into the release directory during deployment.
+             * @optional Listed files will be copied from the current release into each release directory.
              */
-            'linked_dirs' => ['app/storage/cache', 'app/storage/logs', 'app/storage/sessions'],
+            'copied_files' => [],
 
             /**
-             * Listed cronjobs will be installed to the user crontab during deployment.
+             * @optional Listed directories will be copied from the current release into the release directory.
+             */
+            'copied_dirs' => ['node_modules', 'vendor'],
+
+            /**
+             * @optional Listed cronjobs will be installed to the user crontab during deployment.
              */
             'cron_jobs' => [
               // ┌────────────── minute (0 - 59)
@@ -71,33 +83,69 @@ return [
             ],
 
             /**
-             * Email for cron notifications.
+             * @optional Email for cron notifications.
              */
             'cron_mailto' => 'user@example.com',
 
             /**
-             * The last n releases are kept for possible rollbacks.
+             * @optional The last n releases are kept for possible rollbacks.
              */
             'keep_releases' => 5,
 
             /**
-             * Temporary directory used during deployments to store data.
+             * @optional Binary to use to invoke git.
              */
-            'tmp_dir' => '/tmp',
+            'cmd_git' => 'git',
+
+            /**
+             * @optional Binary to use to invoke npm.
+             */
+            'cmd_npm' => 'npm',
+
+            /**
+             * @optional Binary to use to invoke yarn.
+             */
+            'cmd_yarn' => 'yarn',
+
+            /**
+             * @optional Binary to use to invoke bower.
+             */
+            'cmd_bower' => 'bower',
+
+            /**
+             * @optional Binary to use to invoke grunt.
+             */
+            'cmd_grunt' => 'grunt',
+
+            /**
+             * @optional Binary to use to invoke php.
+             */
+            'cmd_php' => 'php',
+
+            /**
+             * @optional Binary to use to invoke composer.
+             */
+            'cmd_composer' => 'composer',
+
+            /**
+             * @optional Additional composer options.
+             */
+            'cmd_composer_options' => '--no-dev'
         ],
     ],
 
     /**
-     * Slack notification configuration on deployment.
+     * @optional Slack notification configuration on deployment.
      */
     'slack' => [
-        /**
-         * Slack URL for notifications.
-         */
-        'url'     => 'https://hooks.slack.com/services/XXXXXX/YYYYYY/ZZZZZZ',
 
         /**
-         * Slack channel where to send notifications.
+         * @mandatory Slack URL for notifications.
+         */
+        'url' => 'https://hooks.slack.com/services/XXXXXX/YYYYYY/ZZZZZZ',
+
+        /**
+         * @optional Slack channel where to send notifications.
          */
         'channel' => '#deployments',
     ],
