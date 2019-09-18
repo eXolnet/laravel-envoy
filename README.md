@@ -1,6 +1,6 @@
 # Laravel Envoy Template
 
-[![Latest Stable Version](https://poser.pugx.org/eXolnet/laravel-envoy/v/stable?format=flat-square)](https://packagist.org/packages/eXolnet/laravel-envoy)
+[![Latest Stable Version](https://img.shields.io/packagist/vpre/eXolnet/laravel-envoy.svg?style=flat-square)](https://packagist.org/packages/eXolnet/laravel-envoy)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Build Status](https://img.shields.io/travis/eXolnet/laravel-envoy/master.svg?style=flat-square)](https://travis-ci.org/eXolnet/laravel-envoy)
 [![Total Downloads](https://img.shields.io/packagist/dt/eXolnet/laravel-envoy.svg?style=flat-square)](https://packagist.org/packages/eXolnet/laravel-envoy)
@@ -9,21 +9,90 @@ This repository contains automated deployment template for Laravel Envoy. The de
 
 ## Installation
 
-1. Require this package with composer: `composer require exolnet/laravel-envoy`
-2. Create a `Envoy.blade.php` on your project's root with the following content: `@include('vendor/exolnet/laravel-envoy/init.php')`
-3. Create your deployment configuration in your Laravel project at `app/config/deploy.php`. An example config file is provided in this repository at `config/deploy.php`
-4. Setup the deployment folders on your remote host: `vendor/bin/envoy run deploy:setup`
-5. Enjoy!
+1. Require this package with composer: `composer require --dev exolnet/laravel-envoy:"~1.0.0@rc"`
+2. Create a `Envoy.blade.php` on your project's root with the following content: `@import('exolnet/laravel-envoy')`
+
+    For a typical Laravel project, you should have a file looking like:
+
+    ```blade
+    @import('exolnet/laravel-envoy')
+
+    @task('deploy:publish')
+        cd "{{ $releasePath }}"
+
+        php artisan down
+
+        php artisan migrate --force
+
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:clear
+        php artisan storage:link
+
+        php artisan up
+    @endtask
+    ```
+
+3. Create your deployment configuration in your Laravel project at `config/deploy.php`. An example config file is provided in this repository at `config/deploy.php`
+
+    For a typical Laravel project, you should have a file looking like:
+
+    ```php
+    <?php
+
+    return [
+        'name' => 'example',
+
+        'default' => 'production',
+
+        'environments' => [
+            'production' => [
+                'ssh_host'       => 'example.com',
+                'ssh_user'       => 'example',
+                'deploy_path'    => '/srv/example',
+                'repository_url' => 'git@github.com:example/example.git',
+                'linked_files'   => ['.env'],
+                'linked_dirs'    => ['storage/app', 'storage/framework', 'storage/logs'],
+                'copied_dirs'    => ['node_modules', 'vendor'],
+            ],
+        ],
+
+        'slack' => [
+            'url' => 'https://hooks.slack.com/services/XXXXXX/YYYYYY/ZZZZZZ',
+        ],
+    ];
+    ```
+
+4. Enjoy!
+
+## Upgrade
+
+Please read [UPGRADE-1.x](UPGRADE-1.x.md) for the procedure to upgrade to version 1.x.
 
 ## Usage
 
-To deploy a new version, run the following command: `vendor/bin/envoy run deploy --commit=master`
+The following macro are available:
+
+* `vendor/bin/envoy run setup`: Setup the directory structure and repository on the remote host
+* `vendor/bin/envoy run deploy --commit=abcdef`: Deploy commit `abcdef` to the remote host
+* `vendor/bin/envoy run releases`: List available releases on the remote host
+* `vendor/bin/envoy run rollback [--release=123456]`: Rollback to previous release or to `123456` if specified on the remote host
+* `vendor/bin/envoy run backups`: List existing backups on the remote host
+
+You can also use the native Envoy command too:
+
+* `vendor/bin/envoy tasks`: List available tasks and marcos
+* `vendor/bin/envoy ssh`: Connect to the remove host
+
+Note that you can also use the option `--env=foo` with any of the previous command to connect to an other remote host define in the configuration.
 
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) and [CODE OF CONDUCT](CODE_OF_CONDUCT.md) for details.
 
 ## Security
+
+SSH `StrictHostKeyChecking` is enforced when using git over ssh. If your remote git repository server does not support `SSHFP`/`VerifyHostKeyDNS`, you will need to manually create the `known_hosts` file on the remote host.
 
 If you discover any security related issues, please email security@exolnet.com instead of using the issue tracker.
 
