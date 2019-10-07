@@ -99,7 +99,7 @@
     export GIT_SSH_COMMAND="ssh -q -o PasswordAuthentication=no -o VerifyHostKeyDNS=yes"
 
     {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" remote set-url origin "{{ $repositoryUrl }}"
-    {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" fetch
+    {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" fetch origin +refs/heads/*:refs/heads/* +refs/tags/*:refs/tags/* --prune
 @endtask
 
 @task('deploy:release')
