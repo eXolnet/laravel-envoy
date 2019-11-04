@@ -46,9 +46,9 @@ class ConfigEnvironment extends Config
     {
         $this->override('release', $this->context->get('release'));
         $this->override('commit', $this->context->get('commit'));
-        $this->override('ssh_host', $this->context->get('ssh-host'));
-        $this->override('ssh_user', $this->context->get('ssh-user'));
-        $this->override('deploy_path', $this->context->get('deploy-path'));
+        $this->override('ssh_host', $this->context->get('ssh_host'));
+        $this->override('ssh_user', $this->context->get('ssh_user'));
+        $this->override('deploy_path', $this->context->get('deploy_path'));
     }
 
     /**
