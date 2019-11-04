@@ -373,7 +373,7 @@
     if ($task === 'assert:commit') {
         throw new Exception("No tree-ish specified to deploy. Please provide one using '--commit=tree-ish'.");
     } elseif ($task === 'deploy:check') {
-        throw new Exception("Unmet prerequisites to deploy. Have you run 'deploy:setup' ?");
+        throw new Exception("Unmet prerequisites to deploy. Have you run 'setup' ?");
     } else {
         throw new Exception('Whoops, looks like something went wrong.');
     }
