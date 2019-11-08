@@ -26,7 +26,7 @@
 
 ## `composer.json`
 
-Upgrade this package with composer: `composer require --dev exolnet/laravel-envoy:"~1.0.0@rc"`
+Upgrade this package with composer: `composer require --dev exolnet/laravel-envoy:"~1.0.0"`
 
 ## `config/deploy.php`
 

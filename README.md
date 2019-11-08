@@ -9,7 +9,7 @@ This repository contains automated deployment template for Laravel Envoy. The de
 
 ## Installation
 
-1. Require this package with composer: `composer require --dev exolnet/laravel-envoy:"~1.0.0@rc"`
+1. Require this package with composer: `composer require --dev exolnet/laravel-envoy:"~1.0.0"`
 2. Create a `Envoy.blade.php` on your project's root with the following content: `@import('exolnet/laravel-envoy')`
 
     For a typical Laravel project, you should have a file looking like:
