@@ -193,11 +193,13 @@
 @endtask
 
 @task('deploy:composer')
-    cd "{{ $releasePath }}"
+    @foreach (array_unique([$releasePath, $assetsPath]) as $path)
+        cd "{{ $path }}"
 
-    if [ -f "composer.json" ]; then
-        {{ $cmdComposer }} install {{ $cmdComposerOptions }} --prefer-dist --optimize-autoloader --no-progress --no-interaction --no-suggest
-    fi
+        if [ -f "composer.json" ]; then
+            {{ $cmdComposer }} install {{ $cmdComposerOptions }} --prefer-dist --optimize-autoloader --no-progress --no-interaction --no-suggest
+        fi
+    @endforeach
 @endtask
 
 @task('deploy:npm')
