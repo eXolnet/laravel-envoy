@@ -135,7 +135,7 @@
 
         mkdir -p `dirname "{{ $releasePath }}/{{ $dir }}"`
 
-        ln -sfn "{{ $sharedPath }}/{{ $dir }}" "{{ $releasePath }}/{{ $dir }}"
+        ln -srfn "{{ $sharedPath }}/{{ $dir }}" "{{ $releasePath }}/{{ $dir }}"
     @endforeach
 @endtask
 
@@ -159,7 +159,7 @@
 
         mkdir -p `dirname "{{ $releasePath }}/{{ $file }}"`
 
-        ln -sfn "{{ $sharedPath }}/{{ $file }}" "{{ $releasePath }}/{{ $file }}"
+        ln -srfn "{{ $sharedPath }}/{{ $file }}" "{{ $releasePath }}/{{ $file }}"
     @endforeach
 @endtask
 
@@ -245,7 +245,7 @@
 @task('deploy:symlink')
     echo "Linking directory {{ $releasePath }} to {{ $currentPath }}"
 
-    ln -sfn "{{ $releasePath }}" "{{ $currentPath }}"
+    ln -srfn "{{ $releasePath }}" "{{ $currentPath }}"
 @endtask
 
 @task('deploy:publish')
@@ -335,7 +335,7 @@
 
     echo "Linking directory {{ $releasesPath }}/$RELEASE to {{ $currentPath }}"
 
-    ln -sfn "{{ $releasesPath }}/$RELEASE" "{{ $currentPath }}"
+    ln -srfn "{{ $releasesPath }}/$RELEASE" "{{ $currentPath }}"
 @endtask
 
 @macro('setup')
