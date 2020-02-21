@@ -7,6 +7,11 @@ use Exolnet\Envoy\Exceptions\EnvoyException;
 class ConfigEnvironment extends Config
 {
     /**
+     * @var array
+     */
+    const LOCAL_HOSTS = ['local', 'localhost', '127.0.0.1'];
+
+    /**
      * @var string
      */
     protected $name;
@@ -101,13 +106,23 @@ class ConfigEnvironment extends Config
      */
     public function buildServerString()
     {
+        $host = $this->get('ssh_host');
+
+        if ($this->get('ssh_user')) {
+            $host = $this->get('ssh_user') .'@'. $host;
+        }
+
+        if (in_array($host, static::LOCAL_HOSTS)) {
+            return $host;
+        }
+
         $options = '-qA'; // Same as '-q -A'
 
-        if ($this->has('ssh_options')) {
+        if ($this->get('ssh_options')) {
             $options .= ' '. trim($this->get('ssh_options'));
         }
 
-        return $options .' '. $this->get('ssh_user') .'@'. $this->get('ssh_host');
+        return $options .' '. $host;
     }
 
     /**
@@ -165,10 +180,6 @@ class ConfigEnvironment extends Config
     {
         if (! $this->get('ssh_host')) {
             throw new EnvoyException('SSH host is not defined.');
-        }
-
-        if (! $this->get('ssh_user')) {
-            throw new EnvoyException('SSH user is not defined.');
         }
 
         if (! $this->get('deploy_path')) {
