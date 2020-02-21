@@ -4,6 +4,7 @@ namespace Exolnet\Envoy\Tests\Unit;
 
 use Exolnet\Envoy\ConfigContext;
 use Exolnet\Envoy\ConfigEnvironment;
+use Exolnet\Envoy\Exceptions\EnvoyException;
 use Generator;
 use Mockery as m;
 
@@ -49,9 +50,9 @@ class ConfigEnvironmentTest extends UnitTest
 
     /**
      * @return void
-     * @dataProvider provideTestBuildServerString
+     * @dataProvider provideTestBuildValidServerString
      */
-    public function testBuildServerString($host, $user, $options, $expected): void
+    public function testBuildValidServerString($host, $user, $options, $expected): void
     {
         $overwrites = [
             'ssh_host' => $host,
@@ -67,12 +68,44 @@ class ConfigEnvironmentTest extends UnitTest
     /**
      * @return \Generator
      */
-    public function provideTestBuildServerString(): Generator
+    public function provideTestBuildValidServerString(): Generator
     {
+        yield ['local', '', '', 'local'];
+        yield ['localhost', '', '', 'localhost'];
         yield ['127.0.0.1', '', '', '127.0.0.1'];
-        yield ['hostname', '', '', '-qA hostname'];
+        yield ['localhost', 'user', '', '-qA user@localhost'];
+        yield ['127.0.0.1', 'user', '-p', '-qA -p user@127.0.0.1'];
         yield ['hostname', 'user', '', '-qA user@hostname'];
-        yield ['hostname', '', '-p', '-qA -p hostname'];
         yield ['hostname', 'user', '-p', '-qA -p user@hostname'];
+    }
+
+    /**
+     * @return void
+     * @dataProvider provideTestBuildInvalidServerString
+     */
+    public function testBuildInvalidServerString($host, $user, $options): void
+    {
+        $this->expectException(EnvoyException::class);
+
+        $overwrites = [
+            'ssh_host' => $host,
+            'ssh_user' => $user,
+            'ssh_options' => $options,
+        ];
+
+        $config = new ConfigEnvironment('foo', $overwrites + static::BASE_CONFIG, $this->context);
+
+        $config->buildServerString();
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function provideTestBuildInvalidServerString(): Generator
+    {
+        yield ['hostname', '', ''];
+        yield ['hostname', '', '-p'];
+        yield ['', 'user', ''];
+        yield ['', 'user', '-p'];
     }
 }

@@ -112,7 +112,7 @@ class ConfigEnvironment extends Config
             $host = $this->get('ssh_user') .'@'. $host;
         }
 
-        if (in_array($host, static::LOCAL_HOSTS)) {
+        if ($this->isLocalHost($host)) {
             return $host;
         }
 
@@ -182,6 +182,10 @@ class ConfigEnvironment extends Config
             throw new EnvoyException('SSH host is not defined.');
         }
 
+        if (! $this->get('ssh_user') && ! $this->isLocalHost()) {
+            throw new EnvoyException('SSH user is not defined.');
+        }
+
         if (! $this->get('deploy_path')) {
             throw new EnvoyException('Deploy path is not defined.');
         }
@@ -193,5 +197,14 @@ class ConfigEnvironment extends Config
         if (! $this->get('cron_mailto') && $this->get('cron_jobs')) {
             throw new EnvoyException('Cron MAILTO is not defined.');
         }
+    }
+
+    /**
+     * @param null $host
+     * @return bool
+     */
+    protected function isLocalHost($host = null)
+    {
+        return in_array($host ?? $this->get('ssh_host'), static::LOCAL_HOSTS);
     }
 }
