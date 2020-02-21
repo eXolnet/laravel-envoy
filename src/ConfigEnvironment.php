@@ -7,6 +7,11 @@ use Exolnet\Envoy\Exceptions\EnvoyException;
 class ConfigEnvironment extends Config
 {
     /**
+     * @var array
+     */
+    const LOCAL_HOSTS = ['local', 'localhost', '127.0.0.1'];
+
+    /**
      * @var string
      */
     protected $name;
@@ -101,13 +106,23 @@ class ConfigEnvironment extends Config
      */
     public function buildServerString()
     {
+        $host = $this->get('ssh_host');
+
+        if ($this->get('ssh_user')) {
+            $host = $this->get('ssh_user') .'@'. $host;
+        }
+
+        if ($this->isLocalHost($host)) {
+            return $host;
+        }
+
         $options = '-qA'; // Same as '-q -A'
 
-        if ($this->has('ssh_options')) {
+        if ($this->get('ssh_options')) {
             $options .= ' '. trim($this->get('ssh_options'));
         }
 
-        return $options .' '. $this->get('ssh_user') .'@'. $this->get('ssh_host');
+        return $options .' '. $host;
     }
 
     /**
@@ -167,7 +182,7 @@ class ConfigEnvironment extends Config
             throw new EnvoyException('SSH host is not defined.');
         }
 
-        if (! $this->get('ssh_user')) {
+        if (! $this->get('ssh_user') && ! $this->isLocalHost()) {
             throw new EnvoyException('SSH user is not defined.');
         }
 
@@ -182,5 +197,14 @@ class ConfigEnvironment extends Config
         if (! $this->get('cron_mailto') && $this->get('cron_jobs')) {
             throw new EnvoyException('Cron MAILTO is not defined.');
         }
+    }
+
+    /**
+     * @param null $host
+     * @return bool
+     */
+    protected function isLocalHost($host = null)
+    {
+        return in_array($host ?? $this->get('ssh_host'), static::LOCAL_HOSTS);
     }
 }
