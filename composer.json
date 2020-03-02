@@ -14,13 +14,15 @@
     "authors": [
         {
             "name": "Alexandre D'Eschambeault",
-            "homepage": "https://www.exolnet.com",
-            "role": "Developer"
+            "email": "adeschambeault@exolnet.com"
+        },
+        {
+            "name": "Patrick Gagnon-Renaud",
+            "email": "pgrenaud@exolnet.com"
         },
         {
             "name": "Tom Rochette",
-            "homepage": "https://www.exolnet.com",
-            "role": "Developer"
+            "email": "trochette@exolnet.com"
         }
     ],
     "require": {
