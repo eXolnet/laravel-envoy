@@ -382,7 +382,7 @@
 @enderror
 
 @finished
-    if ($deploy->has('slack')) {
+    if ($task === 'deploy' && $deploy->has('slack')) {
         $slackUrl     = $deploy->get('slack.url');
         $slackChannel = $deploy->get('slack.channel', '#deployments');
         $slackMessage = $deploy->getName() . ' @ ' . $commit .' - Deployed to _'. $environment->getName() .'_ after '. round($deploy->getTimeTotal(), 1) .' sec.';
