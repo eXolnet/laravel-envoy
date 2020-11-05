@@ -197,7 +197,7 @@
         cd "{{ $path }}"
 
         if [ -f "composer.json" ]; then
-            {{ $cmdComposer }} install {{ $cmdComposerOptions }} --prefer-dist --optimize-autoloader --no-progress --no-interaction --no-suggest
+            {{ $cmdComposer }} install {{ $cmdComposerOptions }} --prefer-dist --optimize-autoloader --no-progress --no-interaction
         fi
     @endforeach
 @endtask
