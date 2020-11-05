@@ -25,8 +25,10 @@ This repository contains automated deployment template for Laravel Envoy. The de
         php artisan migrate --force
 
         php artisan config:cache
+        php artisan event:cache
         php artisan route:cache
-        php artisan view:clear
+        php artisan view:cache
+
         php artisan storage:link
 
         php artisan up
