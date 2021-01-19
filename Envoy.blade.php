@@ -227,9 +227,9 @@
 
     if [ -f "package.json" ]; then
         if [ -f "yarn.lock" ]; then
-            {{ $cmdYarn }} run production --no-progress
+            {{ $cmdYarn }} run production
         else
-            {{ $cmdNpm }} run production --no-progress
+            {{ $cmdNpm }} run production
         fi
     fi
 @endtask
