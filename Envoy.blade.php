@@ -383,11 +383,6 @@
 
 @finished
     if (Illuminate\Support\Str::startsWith($task, ['deploy', 'rollback']) && ($environment->has('slack') || $deploy->has('slack'))) {
-        $slack        = $environment->get('slack') ?: $deploy->get('slack');
-        $slackUrl     = $slack['url'];
-        $slackChannel = $slack['channel'] ?? '#deployments';
-        $slackMessage = $deploy->getName() . ' @ ' . $commit .' - Deployed to _'. $environment->getName() .'_ after '. round($deploy->getTimeTotal(), 1) .' sec.';
-
-        @slack($slackUrl, $slackChannel, $slackMessage)
+        Exolnet\Envoy\Slack::make($environment, $deploy, $task)->send();
     }
 @endfinished
