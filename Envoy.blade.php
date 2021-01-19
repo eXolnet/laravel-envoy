@@ -382,7 +382,7 @@
 @enderror
 
 @finished
-    if ($task === 'deploy' && ($environment->has('slack') || $deploy->has('slack'))) {
+    if (Illuminate\Support\Str::startsWith($task, ['deploy', 'rollback']) && ($environment->has('slack') || $deploy->has('slack'))) {
         $slack        = $environment->get('slack') ?: $deploy->get('slack');
         $slackUrl     = $slack['url'];
         $slackChannel = $slack['channel'] ?? '#deployments';
