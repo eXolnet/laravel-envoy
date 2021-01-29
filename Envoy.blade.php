@@ -277,6 +277,21 @@
     rm $FILE
 @endtask
 
+@task('purge:cronjobs')
+    FILE=$(mktemp)
+    crontab -l > $FILE || true
+
+    sed -i '/# EXOLNET-LARAVEL-ENVOY BEGIN {{ $fingerprint }}/,/# EXOLNET-LARAVEL-ENVOY END {{ $fingerprint }}/d' $FILE
+
+    if [ -s $FILE ]; then
+        crontab $FILE
+    else
+        crontab -r || true
+    fi
+
+    rm $FILE
+@endtask
+
 @task('deploy:published')
     true
 @endtask
