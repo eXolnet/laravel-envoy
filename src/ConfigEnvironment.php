@@ -98,7 +98,16 @@ class ConfigEnvironment extends Config
      */
     public function buildFingerprint()
     {
-        return sha1($this->get('server') . $this->get('deploy_path'));
+        // This method should have computed an hash combining the server
+        // string and the deploy path (see the line bellow), but I forgot to
+        // fix this method when splitting 'server' into 'ssh_user' and
+        // 'ssh_host'. Since fixing this would cause issue with all existing
+        // cronjobs and not fixing this does not, I'm leaving this comment
+        // as an explanation why I did not fix it and left it as-is.
+        //
+        // return sha1($this->get('ssh_user') . '@' . $this->get('ssh_host') . ':' . $this->get('deploy_path'));
+
+        return sha1($this->get('deploy_path'));
     }
 
     /**
