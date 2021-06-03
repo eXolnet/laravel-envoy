@@ -125,7 +125,10 @@ class ConfigEnvironment extends Config
             return $host;
         }
 
-        $options = '-qA'; // Same as '-q -A'
+        // Default options:
+        // [-A] Forward ssh agent
+        // [-o LogLevel=error] Suppress ssh banner
+        $options = '-A -o LogLevel=error';
 
         if ($this->get('ssh_options')) {
             $options .= ' '. trim($this->get('ssh_options'));
