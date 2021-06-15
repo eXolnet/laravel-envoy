@@ -3,6 +3,7 @@
 namespace Exolnet\Envoy;
 
 use GuzzleHttp\Client;
+use InvalidArgumentException;
 use Laravel\Envoy\ConfigurationParser;
 
 /**
@@ -65,6 +66,12 @@ class Slack
      */
     public function __construct($hook, $channel, $task, $project, $environment, $commit, $release, $time)
     {
+        if ($hook === null) {
+            throw new InvalidArgumentException(
+                'Slack URL is not defined (hint: you need to export the EXOLNET_ENVOY_SLACK_URL environment variable).'
+            );
+        }
+
         $this->hook = $hook;
         $this->channel = $channel;
         $this->task = $task;
@@ -85,8 +92,8 @@ class Slack
     public static function make(ConfigEnvironment $environment, ConfigDeploy $deploy, $task)
     {
         $slack = $environment->get('slack') ?: $deploy->get('slack');
-        $hook = $slack['url'];
-        $channel = $slack['channel'] ?? '#deployments';
+        $hook = getenv('EXOLNET_ENVOY_SLACK_URL') ?: $slack['url'] ?? null;
+        $channel = getenv('EXOLNET_ENVOY_SLACK_CHANNEL') ?: $slack['channel'] ?? null;
         $project = $deploy->getName();
         $env = $environment->getName();
         $commit = $environment->get('commit');
@@ -112,7 +119,7 @@ class Slack
             $this->time
         );
 
-        return [
+        return array_filter([
             'channel' => $this->channel,
             'attachments' => [
                 [
@@ -133,7 +140,7 @@ class Slack
                     ],
                 ],
             ],
-        ];
+        ]);
     }
 
     /**
