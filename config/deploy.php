@@ -147,6 +147,6 @@ return [
         /**
          * @optional Slack channel where to send notifications.
          */
-        'channel' => '#deployments',
+        // 'channel' => '#deployments',
     ],
 ];
