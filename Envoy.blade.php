@@ -32,6 +32,7 @@
     deploy:provisioning
         deploy:fetch
         deploy:release
+        deploy:git
         deploy:link
         deploy:copy
         deploy:composer
@@ -108,6 +109,17 @@
 
     {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" --work-tree "{{ $releasePath }}" checkout -f {{ $commit }}
     {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" --work-tree "{{ $releasePath }}" rev-parse HEAD > "{{ $releasePath }}/REVISION"
+@endtask
+
+@task('deploy:git')
+    cd "{{ $releasePath }}"
+
+    cat > "{{ $releasePath }}/git" <<'EOL'
+    #!/usr/bin/env bash
+    {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" --work-tree "{{ $releasePath }}" "$@"
+    EOL
+
+    chmod +x "{{ $releasePath }}/git"
 @endtask
 
 @task('deploy:link')
