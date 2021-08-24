@@ -6,6 +6,17 @@
 
 @servers(['web' => $serverString])
 
+@task('releases:current')
+    basename "$(realpath "{{ $currentPath }}")"
+@endtask
+
+@setup
+    if ($current === true) {
+        $environment->detectCurrentRelease();
+        extract($environment->extractVariables());
+    }
+@endsetup
+
 @task('assert:commit')
     @if (! $commit)
         echo "Commit not defined." 1>&2

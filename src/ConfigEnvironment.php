@@ -2,7 +2,10 @@
 
 namespace Exolnet\Envoy;
 
+use Exception;
 use Exolnet\Envoy\Exceptions\EnvoyException;
+use Laravel\Envoy\SSH;
+use Symfony\Component\Process\Process;
 
 class ConfigEnvironment extends Config
 {
@@ -10,6 +13,11 @@ class ConfigEnvironment extends Config
      * @var array
      */
     const LOCAL_HOSTS = ['local', 'localhost', '127.0.0.1'];
+
+    /**
+     * @var string
+     */
+    public const INVALID_RELEASE = '__INVALID__';
 
     /**
      * @var string
@@ -49,11 +57,41 @@ class ConfigEnvironment extends Config
      */
     protected function overrideConfiguration()
     {
+        $this->override('current', $this->context->get('current'));
         $this->override('release', $this->context->get('release'));
         $this->override('commit', $this->context->get('commit'));
         $this->override('ssh_host', $this->context->get('ssh_host'));
         $this->override('ssh_user', $this->context->get('ssh_user'));
         $this->override('deploy_path', $this->context->get('deploy_path'));
+    }
+
+    /**
+     * @return void
+     * @throws \Exception
+     */
+    public function detectCurrentRelease()
+    {
+        $task = $this->context->get('__container')->getTask('releases:current');
+        $release = self::INVALID_RELEASE;
+        $errors = [];
+
+        (new SSH())->run($task, function ($type, $host, $line) use (&$release, &$errors) {
+            if ($type === Process::OUT) {
+                $release = trim($line);
+            } else {
+                $errors[] = rtrim($line);
+            }
+        });
+
+        if ($errors) {
+            throw new Exception('Unable to detect the current version. Reason:'. PHP_EOL . implode(PHP_EOL, $errors));
+        }
+
+        if (! $release || $release === self::INVALID_RELEASE) {
+            throw new Exception('Unable to detect the current version. No releases were found.');
+        }
+
+        $this->set('release', $release);
     }
 
     /**
@@ -144,6 +182,7 @@ class ConfigEnvironment extends Config
     {
         return [
             // Variables defined in the configuration file (or overwritten by context)
+            'current'                 => $this->get('current'),
             'release'                 => $this->get('release'),
             'commit'                  => $this->get('commit'),
             'sshHost'                 => $this->get('ssh_host'),
