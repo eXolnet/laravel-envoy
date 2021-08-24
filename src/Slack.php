@@ -91,9 +91,8 @@ class Slack
      */
     public static function make(ConfigEnvironment $environment, ConfigDeploy $deploy, $task)
     {
-        $slack = $environment->get('slack') ?: $deploy->get('slack');
-        $hook = getenv('EXOLNET_ENVOY_SLACK_URL') ?: $slack['url'] ?? null;
-        $channel = getenv('EXOLNET_ENVOY_SLACK_CHANNEL') ?: $slack['channel'] ?? null;
+        $hook = $deploy->get('slack_url');
+        $channel = $deploy->get('slack_channel');
         $project = $deploy->getName();
         $env = $environment->getName();
         $commit = $environment->get('commit');

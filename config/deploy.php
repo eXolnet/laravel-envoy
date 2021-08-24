@@ -133,20 +133,4 @@ return [
             'cmd_composer_options' => '--no-dev'
         ],
     ],
-
-    /**
-     * @optional Slack notification configuration on deployment.
-     */
-    'slack' => [
-
-        /**
-         * @mandatory Slack URL for notifications.
-         */
-        'url' => 'https://hooks.slack.com/services/XXXXXX/YYYYYY/ZZZZZZ',
-
-        /**
-         * @optional Slack channel where to send notifications.
-         */
-        // 'channel' => '#deployments',
-    ],
 ];

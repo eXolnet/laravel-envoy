@@ -409,7 +409,11 @@
 @enderror
 
 @finished
-    if (Illuminate\Support\Str::startsWith($task, ['deploy', 'rollback']) && ($environment->has('slack') || $deploy->has('slack'))) {
-        Exolnet\Envoy\Slack::make($environment, $deploy, $task)->send();
+    if (Illuminate\Support\Str::startsWith($task, ['deploy', 'rollback'])) {
+        $deploy->detectSlack();
+
+        if ($deploy->has('slack_url')) {
+            Exolnet\Envoy\Slack::make($environment, $deploy, $task)->send();
+        }
     }
 @endfinished

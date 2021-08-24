@@ -71,6 +71,48 @@ class ConfigDeploy extends Config
     }
 
     /**
+     * @return void
+     * @throws \Exception
+     */
+    public function detectSlack()
+    {
+        if ($this->get('slack') !== null) {
+            // phpcs:disable Generic.Files.LineLength.TooLong
+            echo PHP_EOL;
+            echo "\033[30;43m                                                                                           \033[39;49m". PHP_EOL;
+            echo "\033[30;43m [WARNING] The 'slack' key is deprecated and should be removed from the 'deploy.php' file. \033[39;49m". PHP_EOL;
+            echo "\033[30;43m                                                                                           \033[39;49m". PHP_EOL;
+            echo PHP_EOL;
+            // phpcs:enable
+        }
+
+        // Ensure that it is not possible to set those keys in the deploy.php file
+        $this->forget(['slack_url', 'slack_channel']);
+
+        $url = getenv('EXOLNET_ENVOY_SLACK_URL') ?: null;
+
+        if ($url !== null) {
+            $this->set('slack_url', $url);
+        } else {
+            // phpcs:disable Generic.Files.LineLength.TooLong
+            echo PHP_EOL;
+            echo "\033[30;43m                                                                                           \033[39;49m". PHP_EOL;
+            echo "\033[30;43m [WARNING] No slack URL have been defined.                                                 \033[39;49m". PHP_EOL;
+            echo "\033[30;43m                                                                                           \033[39;49m". PHP_EOL;
+            echo "\033[30;43m The 'EXOLNET_ENVOY_SLACK_URL' environment variable need to be set and passed to envoy.    \033[39;49m". PHP_EOL;
+            echo "\033[30;43m                                                                                           \033[39;49m". PHP_EOL;
+            echo PHP_EOL;
+            // phpcs:enable
+        }
+
+        $channel = getenv('EXOLNET_ENVOY_SLACK_CHANNEL') ?: null;
+
+        if ($channel !== null) {
+            $this->set('slack_channel', $channel);
+        }
+    }
+
+    /**
      * @return string
      */
     protected function getBasePath()
