@@ -409,6 +409,10 @@
     fi
 @endtask
 
+@task('fetch:app_url')
+    grep "APP_URL" "{{ $releasePath }}/.env" | grep -v -e '^\s*#' | cut -d '=' -f 2-
+@endtask
+
 @error
     if ($task === 'assert:commit') {
         throw new Exception("No tree-ish specified to deploy. Please provide one using '--commit=tree-ish'.");
@@ -424,6 +428,7 @@
         $deploy->detectSlack();
 
         if ($deploy->has('slack_url')) {
+            $environment->detectAppUrl();
             Exolnet\Envoy\Slack::make($environment, $deploy, $task)->send();
         }
     }

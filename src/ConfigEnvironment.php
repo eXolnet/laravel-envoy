@@ -95,6 +95,26 @@ class ConfigEnvironment extends Config
     }
 
     /**
+     * @return void
+     * @throws \Exception
+     */
+    public function detectAppUrl()
+    {
+        $task = $this->context->get('__container')->getTask('fetch:app_url');
+        $appUrl = null;
+
+        (new SSH())->run($task, function ($type, $host, $line) use (&$appUrl) {
+            if ($type === Process::OUT) {
+                $appUrl = trim($line);
+            }
+        });
+
+        if ($appUrl) {
+            $this->set('app_url', $appUrl);
+        }
+    }
+
+    /**
      * @return string
      */
     public function getName()

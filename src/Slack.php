@@ -49,6 +49,11 @@ class Slack
     protected $release;
 
     /**
+     * @var string
+     */
+    protected $appUrl;
+
+    /**
      * @var float
      */
     protected $time;
@@ -63,9 +68,10 @@ class Slack
      * @param string $environment
      * @param string $commit
      * @param string $release
+     * @param string $appUrl
      * @param float  $time
      */
-    public function __construct($hook, $channel, $task, $project, $environment, $commit, $release, $time)
+    public function __construct($hook, $channel, $task, $project, $environment, $commit, $release, $appUrl, $time)
     {
         if ($hook === null) {
             throw new InvalidArgumentException(
@@ -80,6 +86,7 @@ class Slack
         $this->environment = $environment;
         $this->commit = $commit;
         $this->release = $release;
+        $this->appUrl = $appUrl;
         $this->time = $time;
     }
 
@@ -98,9 +105,10 @@ class Slack
         $env = $environment->getName();
         $commit = $environment->get('commit');
         $release = $environment->get('release');
+        $appUrl = $environment->get('app_url');
         $time = round($deploy->getTimeTotal(), 1);
 
-        return new static($hook, $channel, $task, $project, $env, $commit, $release, $time);
+        return new static($hook, $channel, $task, $project, $env, $commit, $release, $appUrl, $time);
     }
 
     /**
@@ -119,6 +127,32 @@ class Slack
             $this->time
         );
 
+        $fields = [];
+
+        if ($this->commit) {
+            $fields[] = [
+                'title' => 'Commit',
+                'value' => $this->commit,
+                'short' => true,
+            ];
+        }
+
+        if ($this->release) {
+            $fields[] = [
+                'title' => 'Release',
+                'value' => $this->release,
+                'short' => true,
+            ];
+        }
+
+        if ($this->appUrl) {
+            $fields[] = [
+                'title' => 'URL',
+                'value' => $this->appUrl,
+                'short' => false,
+            ];
+        }
+
         return array_filter([
             'channel' => $this->channel,
             'attachments' => [
@@ -126,18 +160,7 @@ class Slack
                     'color' => 'good',
                     'text' => $message,
                     'mrkdwn_in' => ['text'],
-                    'fields' => [
-                        [
-                            'title' => 'Commit',
-                            'value' => $this->commit,
-                            'short' => true,
-                        ],
-                        [
-                            'title' => 'Release',
-                            'value' => $this->release,
-                            'short' => true,
-                        ],
-                    ],
+                    'fields' => $fields,
                 ],
             ],
         ]);
