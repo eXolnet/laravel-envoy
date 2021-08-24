@@ -155,5 +155,7 @@ class Slack
         (new Client())->post($this->hook, [
             'json' => $payload,
         ]);
+
+        echo 'Slack notification sent.'. PHP_EOL;
     }
 }
