@@ -9,7 +9,7 @@ This repository contains automated deployment template for Laravel Envoy. The de
 
 ## Installation
 
-1. Require this package with composer: `composer require --dev exolnet/laravel-envoy:"^1.0"`
+1. Require this package with composer: `composer require --dev exolnet/laravel-envoy:"^1.9"`
 2. Create a `Envoy.blade.php` on your project's root with the following content: `@import('exolnet/laravel-envoy')`
 
     For a typical Laravel project, you should have a file looking like:
@@ -58,10 +58,6 @@ This repository contains automated deployment template for Laravel Envoy. The de
                 'copied_dirs'    => ['node_modules', 'vendor'],
             ],
         ],
-
-        'slack' => [
-            'url' => 'https://hooks.slack.com/services/XXXXXX/YYYYYY/ZZZZZZ',
-        ],
     ];
     ```
 
@@ -77,6 +73,7 @@ The following macro are available:
 
 * `vendor/bin/envoy run setup`: Setup the directory structure and repository on the remote host
 * `vendor/bin/envoy run deploy --commit=abcdef`: Deploy commit `abcdef` to the remote host
+* `vendor/bin/envoy run deploy:publish --current`: Run the `deploy:publish` task for the current release on the remote host
 * `vendor/bin/envoy run releases`: List available releases on the remote host
 * `vendor/bin/envoy run rollback [--release=123456]`: Rollback to previous release or to `123456` if specified on the remote host
 * `vendor/bin/envoy run backups`: List existing backups on the remote host
