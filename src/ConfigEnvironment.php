@@ -12,7 +12,7 @@ class ConfigEnvironment extends Config
     /**
      * @var array
      */
-    const LOCAL_HOSTS = ['local', 'localhost', '127.0.0.1'];
+    public const LOCAL_HOSTS = ['local', 'localhost', '127.0.0.1'];
 
     /**
      * @var string

@@ -62,6 +62,7 @@ class Slack
      * @param string $project
      * @param string $environment
      * @param string $commit
+     * @param string $release
      * @param float  $time
      */
     public function __construct($hook, $channel, $task, $project, $environment, $commit, $release, $time)
