@@ -2,7 +2,7 @@
 
 [![Latest Stable Version](https://img.shields.io/packagist/v/eXolnet/laravel-envoy.svg?style=flat-square)](https://packagist.org/packages/eXolnet/laravel-envoy)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/eXolnet/laravel-envoy/master.svg?style=flat-square)](https://travis-ci.org/eXolnet/laravel-envoy)
+[![Build Status](https://img.shields.io/github/workflow/status/eXolnet/laravel-envoy/tests?label=tests&style=flat-square)](https://github.com.org/eXolnet/laravel-envoy/actions?query=workflow%3Atests)
 [![Total Downloads](https://img.shields.io/packagist/dt/eXolnet/laravel-envoy.svg?style=flat-square)](https://packagist.org/packages/eXolnet/laravel-envoy)
 
 This repository contains automated deployment template for Laravel Envoy. The deployment flow is based on [Capistrano](http://capistranorb.com/).
