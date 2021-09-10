@@ -73,10 +73,10 @@ class ConfigEnvironmentTest extends UnitTest
         yield ['local', '', '', 'local'];
         yield ['localhost', '', '', 'localhost'];
         yield ['127.0.0.1', '', '', '127.0.0.1'];
-        yield ['localhost', 'user', '', '-qA user@localhost'];
-        yield ['127.0.0.1', 'user', '-p', '-qA -p user@127.0.0.1'];
-        yield ['hostname', 'user', '', '-qA user@hostname'];
-        yield ['hostname', 'user', '-p', '-qA -p user@hostname'];
+        yield ['localhost', 'user', '', '-A -o LogLevel=error user@localhost'];
+        yield ['127.0.0.1', 'user', '-p', '-A -o LogLevel=error -p user@127.0.0.1'];
+        yield ['hostname', 'user', '', '-A -o LogLevel=error user@hostname'];
+        yield ['hostname', 'user', '-p', '-A -o LogLevel=error -p user@hostname'];
     }
 
     /**
