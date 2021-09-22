@@ -22,6 +22,11 @@ class ConfigEnvironment extends Config
     /**
      * @var string
      */
+    protected const DEFAULT_GIT_SSH_COMMAND = 'ssh -q -o PasswordAuthentication=no -o VerifyHostKeyDNS=yes';
+
+    /**
+     * @var string
+     */
     protected $name;
 
     /**
@@ -227,6 +232,7 @@ class ConfigEnvironment extends Config
             'cmdPhp'                  => $this->get('cmd_php', 'php'),
             'cmdComposer'             => $this->get('cmd_composer', 'composer'),
             'cmdComposerOptions'      => $this->get('cmd_composer_options', '--no-dev'),
+            'gitSshCommand'           => $this->get('git_ssh_command', self::DEFAULT_GIT_SSH_COMMAND),
 
             // Variables computed internally
             'fingerprint'             => $this->buildFingerprint(),

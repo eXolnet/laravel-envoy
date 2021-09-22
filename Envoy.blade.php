@@ -108,7 +108,9 @@
 @endtask
 
 @task('deploy:fetch')
-    export GIT_SSH_COMMAND="ssh -q -o PasswordAuthentication=no -o VerifyHostKeyDNS=yes"
+    @if ($gitSshCommand)
+        export GIT_SSH_COMMAND="{{ $gitSshCommand }}"
+    @endif
 
     {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" remote set-url origin "{{ $repositoryUrl }}"
     {{ $cmdGit }} --git-dir "{{ $repositoryPath }}" fetch origin +refs/heads/*:refs/heads/* +refs/tags/*:refs/tags/* --prune
@@ -382,7 +384,9 @@
 @endmacro
 
 @task('setup:repository')
-    export GIT_SSH_COMMAND="ssh -q -o PasswordAuthentication=no -o VerifyHostKeyDNS=yes"
+    @if ($gitSshCommand)
+        export GIT_SSH_COMMAND="{{ $gitSshCommand }}"
+    @endif
 
     if [ -d "{{ $repoPath }}" ]; then
         echo "Deleting directory {{ $repoPath }}" 1>&2
