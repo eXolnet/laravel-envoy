@@ -17,7 +17,7 @@ class SlackTest extends TestCase
     public function setUp(): void
     {
         $this->slack = new Slack(
-            'https://localhost/',
+            'TheHook',
             'TheChannel',
             'TheTask',
             'TheProject',
@@ -68,18 +68,5 @@ class SlackTest extends TestCase
         $deploy->shouldReceive('getTimeTotal')->once()->andReturn(1);
 
         $this->assertInstanceOf(Slack::class, Slack::make($environment, $deploy, $task));
-    }
-
-    /**
-     * @test
-     * @return void
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function testSend(): void
-    {
-        $this->slack->send();
-
-        // Needed to assert something to have the coverage on the test
-        $this->assertTrue(true);
     }
 }
