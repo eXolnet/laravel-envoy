@@ -30,7 +30,7 @@
         "exolnet/envoy": "^1.107.0"
     },
     "require-dev": {
-        "mockery/mockery": "^1.4.3",
+        "mockery/mockery": "^1.4",
         "phpunit/phpunit": "^8.0",
         "squizlabs/php_codesniffer": "^3.6"
     },
