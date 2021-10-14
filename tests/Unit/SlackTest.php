@@ -5,8 +5,10 @@ namespace Exolnet\Envoy\Tests\Unit;
 use Exolnet\Envoy\ConfigDeploy;
 use Exolnet\Envoy\ConfigEnvironment;
 use Exolnet\Envoy\Slack;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Server\Server;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -18,8 +20,9 @@ class SlackTest extends TestCase
 
     public function setUp(): void
     {
-        $this->slack = new Slack(
-            Server::$url,
+//        $this->slack = new Slack(
+        $this->slack = m::mock(Slack::class . '[makeClient]', [
+            'TheHook',
             'TheChannel',
             'TheTask',
             'TheProject',
@@ -28,7 +31,7 @@ class SlackTest extends TestCase
             'TheRelease',
             'TheAppUrl',
             0
-        );
+        ]);
     }
 
     /**
@@ -127,10 +130,13 @@ class SlackTest extends TestCase
      */
     public function testSend(): void
     {
-        Server::enqueue([
+        $mock = new MockHandler([
             new Response(200),
         ]);
+        $handlerStack = HandlerStack::create($mock);
+        $client = new Client(['handler' => $handlerStack]);
 
+        $this->slack->shouldAllowMockingProtectedMethods()->shouldReceive('makeClient')->once()->andReturn($client);
         $this->slack->send();
 
         $this->expectOutputString('Slack notification sent.'. PHP_EOL);
