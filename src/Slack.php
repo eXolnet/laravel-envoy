@@ -176,10 +176,18 @@ class Slack
     {
         $payload = $this->buildPayload();
 
-        (new Client())->post($this->hook, [
+        $this->makeClient()->post($this->hook, [
             'json' => $payload,
         ]);
 
         echo 'Slack notification sent.'. PHP_EOL;
+    }
+
+    /**
+     * @return \GuzzleHttp\Client
+     */
+    protected function makeClient(): Client
+    {
+        return new Client();
     }
 }
