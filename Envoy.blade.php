@@ -414,7 +414,7 @@
 @endtask
 
 @task('fetch:app_url')
-    grep "APP_URL" "{{ $releasePath }}/.env" | grep -v -e '^\s*#' | cut -d '=' -f 2-
+    grep -e "^APP_URL" "{{ $releasePath }}/.env" | cut -d '=' -f 2- | tr -d '"' | tr -d "'"
 @endtask
 
 @error
