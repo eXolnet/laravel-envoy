@@ -35,7 +35,7 @@
     ],
     "require": {
         "php": "^7.3|^8.0",
-        "exolnet/envoy": "^1.107.0"
+        "exolnet/envoy": "^1.108.0"
     },
     "require-dev": {
         "mockery/mockery": "^1.4",
