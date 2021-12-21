@@ -80,10 +80,11 @@ The following macro are available:
 
 You can also use the native Envoy command too:
 
-* `vendor/bin/envoy tasks`: List available tasks and marcos
-* `vendor/bin/envoy ssh`: Connect to the remove host
+* `vendor/bin/envoy tasks`: List available tasks and macros
+* `vendor/bin/envoy ssh`: Connect to the remote host
 
-Note that you can also use the option `--env=foo` with any of the previous command to connect to an other remote host define in the configuration.
+Note that you can also use the option `--env=foo` with any of the previous command to connect to an other remote 
+define in the configuration.
 
 ## Contributing
 
