@@ -13,7 +13,7 @@ class ConfigEnvironmentTest extends UnitTest
     /**
      * @var array
      */
-    const BASE_CONFIG = [
+    protected const BASE_CONFIG = [
         'ssh_host' => 'hostname',
         'ssh_user' => 'user',
         'deploy_path' => '/deployment/path',

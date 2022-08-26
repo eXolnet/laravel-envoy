@@ -89,7 +89,7 @@ class ConfigEnvironment extends Config
         });
 
         if ($errors) {
-            throw new Exception('Unable to detect the current version. Reason:'. PHP_EOL . implode(PHP_EOL, $errors));
+            throw new Exception('Unable to detect the current version. Reason:' . PHP_EOL . implode(PHP_EOL, $errors));
         }
 
         if (! $release || $release === self::INVALID_RELEASE) {
@@ -134,7 +134,7 @@ class ConfigEnvironment extends Config
      */
     public function getRelativePath($basePath, $relativePath = '')
     {
-        return rtrim($basePath, '/') . ($relativePath ? '/'. ltrim($relativePath, '/') : '');
+        return rtrim($basePath, '/') . ($relativePath ? '/' . ltrim($relativePath, '/') : '');
     }
 
     /**
@@ -181,7 +181,7 @@ class ConfigEnvironment extends Config
         $host = $this->get('ssh_host');
 
         if ($this->get('ssh_user')) {
-            $host = $this->get('ssh_user') .'@'. $host;
+            $host = $this->get('ssh_user') . '@' . $host;
         }
 
         if ($this->isLocalHost($host)) {
@@ -194,10 +194,10 @@ class ConfigEnvironment extends Config
         $options = '-A -o LogLevel=error';
 
         if ($this->get('ssh_options')) {
-            $options .= ' '. trim($this->get('ssh_options'));
+            $options .= ' ' . trim($this->get('ssh_options'));
         }
 
-        return $options .' '. $host;
+        return $options . ' ' . $host;
     }
 
     /**

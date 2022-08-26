@@ -180,7 +180,7 @@ class Slack
             'json' => $payload,
         ]);
 
-        echo 'Slack notification sent.'. PHP_EOL;
+        echo 'Slack notification sent.' . PHP_EOL;
     }
 
     /**

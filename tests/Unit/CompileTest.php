@@ -22,7 +22,7 @@ class CompileTest extends UnitTest
 
         $container = new TaskContainer();
 
-        $container->load($this->getEnvoyMockPath(), new Compiler);
+        $container->load($this->getEnvoyMockPath(), new Compiler());
 
         $this->assertArrayHasKey('setup', $container->getMacros());
         $this->assertArrayHasKey('deploy:check', $container->getTasks());

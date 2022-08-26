@@ -139,6 +139,6 @@ class SlackTest extends TestCase
         $this->slack->shouldAllowMockingProtectedMethods()->shouldReceive('makeClient')->once()->andReturn($client);
         $this->slack->send();
 
-        $this->expectOutputString('Slack notification sent.'. PHP_EOL);
+        $this->expectOutputString('Slack notification sent.' . PHP_EOL);
     }
 }

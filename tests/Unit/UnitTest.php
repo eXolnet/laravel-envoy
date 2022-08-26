@@ -11,7 +11,7 @@ abstract class UnitTest extends TestCase
      */
     protected function getEnvoyPath()
     {
-        return realpath(__DIR__ .'/../../Envoy.blade.php');
+        return realpath(__DIR__ . '/../../Envoy.blade.php');
     }
 
     /**
@@ -19,6 +19,6 @@ abstract class UnitTest extends TestCase
      */
     protected function getEnvoyMockPath()
     {
-        return realpath(__DIR__ .'/../Mock/Envoy.blade.php');
+        return realpath(__DIR__ . '/../Mock/Envoy.blade.php');
     }
 }
