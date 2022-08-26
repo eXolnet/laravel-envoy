@@ -53,8 +53,8 @@
         }
     },
     "scripts": {
-        "lint": "vendor/bin/phpcs -p --standard=PSR2 config src tests/Unit",
-        "lint-fix": "vendor/bin/phpcbf -p --standard=PSR2 config src tests/Unit",
+        "lint": "vendor/bin/phpcs -p --standard=PSR12 config src tests/Unit",
+        "lint-fix": "vendor/bin/phpcbf -p --standard=PSR12 config src tests/Unit",
         "test": "vendor/bin/phpunit"
     },
     "config": {
