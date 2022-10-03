@@ -55,7 +55,8 @@
     "scripts": {
         "lint": "vendor/bin/phpcs -p --standard=PSR12 config src tests/Unit",
         "lint:fix": "vendor/bin/phpcbf -p --standard=PSR12 config src tests/Unit",
-        "test": "vendor/bin/phpunit"
+        "test": "vendor/bin/phpunit",
+        "test:coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
     "config": {
         "sort-packages": true
