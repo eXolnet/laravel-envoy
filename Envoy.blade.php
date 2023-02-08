@@ -35,6 +35,7 @@
 @endtask
 
 @macro('deploy')
+    {{-- deploy:prepare --}}
     assert:commit
     deploy:starting
         deploy:check
@@ -52,6 +53,39 @@
     deploy:building
         deploy:build
     deploy:built
+    
+    {{-- deploy:complete --}}
+    deploy:publishing
+        deploy:symlink
+        deploy:publish
+        deploy:cronjobs
+    deploy:published
+    deploy:finishing
+        deploy:cleanup
+    deploy:finished
+@endmacro
+
+@macro('deploy:prepare')
+    assert:commit
+    deploy:starting
+        deploy:check
+        deploy:backup
+    deploy:started
+    deploy:provisioning
+        deploy:fetch
+        deploy:release
+        deploy:git
+        deploy:link
+        deploy:copy
+        deploy:composer
+        deploy:npm
+    deploy:provisioned
+    deploy:building
+        deploy:build
+    deploy:built
+@endmacro
+
+@macro('deploy:complete')
     deploy:publishing
         deploy:symlink
         deploy:publish
