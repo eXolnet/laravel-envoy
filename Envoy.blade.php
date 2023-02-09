@@ -35,7 +35,7 @@
 @endtask
 
 @macro('deploy')
-    {{-- deploy:prepare --}}
+    {{-- BEGIN deploy:prepare --}}
     assert:commit
     deploy:starting
         deploy:check
@@ -53,8 +53,8 @@
     deploy:building
         deploy:build
     deploy:built
-    
-    {{-- deploy:complete --}}
+    {{-- END deploy:prepare --}}
+    {{-- BEGIN deploy:complete --}}
     deploy:publishing
         deploy:symlink
         deploy:publish
@@ -63,6 +63,7 @@
     deploy:finishing
         deploy:cleanup
     deploy:finished
+    {{-- END deploy:complete --}}
 @endmacro
 
 @macro('deploy:prepare')
