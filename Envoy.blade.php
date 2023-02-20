@@ -267,7 +267,7 @@
 
     if [ -f "package.json" ]; then
         if [ -f "yarn.lock" ]; then
-            {{ $cmdYarn }} install --pure-lockfile --no-progress --non-interactive
+            {{ $cmdYarn }} install --frozen-lockfile --no-progress --non-interactive
         else
             {{ $cmdNpm }} install
         fi
