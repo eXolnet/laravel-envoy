@@ -1,7 +1,7 @@
 # Laravel Envoy Template
 
 [![Latest Stable Version](https://img.shields.io/packagist/v/eXolnet/laravel-envoy.svg?style=flat-square)](https://packagist.org/packages/eXolnet/laravel-envoy)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 [![Build Status](https://img.shields.io/github/workflow/status/eXolnet/laravel-envoy/tests?label=tests&style=flat-square)](https://github.com.org/eXolnet/laravel-envoy/actions?query=workflow%3Atests)
 [![Total Downloads](https://img.shields.io/packagist/dt/eXolnet/laravel-envoy.svg?style=flat-square)](https://packagist.org/packages/eXolnet/laravel-envoy)
 
