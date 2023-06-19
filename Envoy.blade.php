@@ -305,6 +305,11 @@
 @task('deploy:symlink')
     echo "Linking directory {{ $releasePath }} to {{ $currentPath }}"
 
+    if [ ! -d "{{ $releasePath }}" ]; then
+        echo "Release directory not found." 1>&2
+        exit 1
+    fi
+
     ln -srfn "{{ $releasePath }}" "{{ $currentPath }}"
 @endtask
 
