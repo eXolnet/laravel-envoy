@@ -1,3 +1,5 @@
+@version('exolnet/laravel-envoy 1.17.2')
+
 @setup
     $deploy      = new Exolnet\Envoy\ConfigDeploy(get_defined_vars());
     $environment = $deploy->getEnvironment();
