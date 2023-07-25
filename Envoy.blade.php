@@ -1,4 +1,4 @@
-@version('exolnet/laravel-envoy 1.17.2')
+@version('exolnet/laravel-envoy 1.18.0')
 
 @setup
     $deploy      = new Exolnet\Envoy\ConfigDeploy(get_defined_vars());
