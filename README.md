@@ -100,7 +100,7 @@ If you discover any security related issues, please email security@exolnet.com i
 
 - [Alexandre D'Eschambeault](https://github.com/xel1045)
 - [Tom Rochette](https://github.com/tomzx)
-- [Pat Gagnon-Renaud](https://github.com/pgrenaud)
+- [Patricia Gagnon-Renaud](https://github.com/pgrenaud)
 - [Simon Gaudreau](https://github.com/Gandhi11)
 - [Martin Blanchette](https://github.com/martinblanchette)
 - [All Contributors](../../contributors)
