@@ -269,7 +269,7 @@
 
     if [ -f "package.json" ]; then
         if [ -f "yarn.lock" ]; then
-            {{ $cmdYarn }} install --frozen-lockfile
+            {{ $cmdYarn }} install --immutable
         else
             {{ $cmdNpm }} install
         fi
