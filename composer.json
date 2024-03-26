@@ -34,7 +34,7 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "exolnet/envoy": "^1.110.0"
     },
     "require-dev": {
