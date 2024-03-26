@@ -3,8 +3,6 @@
 namespace Exolnet\Envoy\Tests\Unit;
 
 use Exolnet\Envoy\ConfigDeploy;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class ConfigDeployTest extends TestCase
 {

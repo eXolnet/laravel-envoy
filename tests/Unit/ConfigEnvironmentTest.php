@@ -8,7 +8,7 @@ use Exolnet\Envoy\Exceptions\EnvoyException;
 use Generator;
 use Mockery as m;
 
-class ConfigEnvironmentTest extends UnitTest
+class ConfigEnvironmentTest extends TestCase
 {
     /**
      * @var array

@@ -2,9 +2,9 @@
 
 namespace Exolnet\Envoy\Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 
-abstract class UnitTest extends TestCase
+abstract class TestCase extends BaseTestCase
 {
     /**
      * @return string

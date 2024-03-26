@@ -5,7 +5,7 @@ namespace Exolnet\Envoy\Tests\Unit;
 use Laravel\Envoy\Compiler;
 use Laravel\Envoy\TaskContainer;
 
-class CompileTest extends UnitTest
+class CompileTest extends TestCase
 {
     public function testEnvoyConfigurationCanBeCompiled()
     {
