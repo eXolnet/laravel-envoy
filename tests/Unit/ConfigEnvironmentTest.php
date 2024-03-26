@@ -68,7 +68,7 @@ class ConfigEnvironmentTest extends UnitTest
     /**
      * @return \Generator
      */
-    public function provideTestBuildValidServerString(): Generator
+    public static function provideTestBuildValidServerString(): Generator
     {
         yield ['local', '', '', 'local'];
         yield ['localhost', '', '', 'localhost'];
@@ -101,7 +101,7 @@ class ConfigEnvironmentTest extends UnitTest
     /**
      * @return \Generator
      */
-    public function provideTestBuildInvalidServerString(): Generator
+    public static function provideTestBuildInvalidServerString(): Generator
     {
         yield ['hostname', '', ''];
         yield ['hostname', '', '-p'];
