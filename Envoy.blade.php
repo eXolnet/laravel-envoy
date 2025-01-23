@@ -1,3 +1,5 @@
+@version('exolnet/laravel-envoy 1.18.0')
+
 @setup
     $deploy      = new Exolnet\Envoy\ConfigDeploy(get_defined_vars());
     $environment = $deploy->getEnvironment();
@@ -35,6 +37,7 @@
 @endtask
 
 @macro('deploy')
+    {{-- BEGIN deploy:prepare --}}
     assert:commit
     deploy:starting
         deploy:check
@@ -52,6 +55,40 @@
     deploy:building
         deploy:build
     deploy:built
+    {{-- END deploy:prepare --}}
+    {{-- BEGIN deploy:complete --}}
+    deploy:publishing
+        deploy:symlink
+        deploy:publish
+        deploy:cronjobs
+    deploy:published
+    deploy:finishing
+        deploy:cleanup
+    deploy:finished
+    {{-- END deploy:complete --}}
+@endmacro
+
+@macro('deploy:prepare')
+    assert:commit
+    deploy:starting
+        deploy:check
+        deploy:backup
+    deploy:started
+    deploy:provisioning
+        deploy:fetch
+        deploy:release
+        deploy:git
+        deploy:link
+        deploy:copy
+        deploy:composer
+        deploy:npm
+    deploy:provisioned
+    deploy:building
+        deploy:build
+    deploy:built
+@endmacro
+
+@macro('deploy:complete')
     deploy:publishing
         deploy:symlink
         deploy:publish
@@ -232,7 +269,7 @@
 
     if [ -f "package.json" ]; then
         if [ -f "yarn.lock" ]; then
-            {{ $cmdYarn }} install --pure-lockfile --no-progress --non-interactive
+            {{ $cmdYarn }} install --immutable
         else
             {{ $cmdNpm }} install
         fi
@@ -269,6 +306,11 @@
 
 @task('deploy:symlink')
     echo "Linking directory {{ $releasePath }} to {{ $currentPath }}"
+
+    if [ ! -d "{{ $releasePath }}" ]; then
+        echo "Release directory not found." 1>&2
+        exit 1
+    fi
 
     ln -srfn "{{ $releasePath }}" "{{ $currentPath }}"
 @endtask

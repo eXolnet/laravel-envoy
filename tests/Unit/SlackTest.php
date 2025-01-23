@@ -11,7 +11,6 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
 
 class SlackTest extends TestCase
 {

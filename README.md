@@ -1,8 +1,8 @@
 # Laravel Envoy Template
 
 [![Latest Stable Version](https://img.shields.io/packagist/v/eXolnet/laravel-envoy.svg?style=flat-square)](https://packagist.org/packages/eXolnet/laravel-envoy)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/github/workflow/status/eXolnet/laravel-envoy/tests?label=tests&style=flat-square)](https://github.com.org/eXolnet/laravel-envoy/actions?query=workflow%3Atests)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/eXolnet/laravel-envoy/tests.yml?label=tests&style=flat-square)](https://github.com.org/eXolnet/laravel-envoy/actions?query=workflow%3Atests)
 [![Total Downloads](https://img.shields.io/packagist/dt/eXolnet/laravel-envoy.svg?style=flat-square)](https://packagist.org/packages/eXolnet/laravel-envoy)
 
 This repository contains automated deployment template for Laravel Envoy. The deployment flow is based on [Capistrano](http://capistranorb.com/).
@@ -100,12 +100,14 @@ If you discover any security related issues, please email security@exolnet.com i
 
 - [Alexandre D'Eschambeault](https://github.com/xel1045)
 - [Tom Rochette](https://github.com/tomzx)
-- [Pat Gagnon-Renaud](https://github.com/pgrenaud)
+- [Patricia Gagnon-Renaud](https://github.com/pgrenaud)
 - [Simon Gaudreau](https://github.com/Gandhi11)
 - [Martin Blanchette](https://github.com/martinblanchette)
 - [All Contributors](../../contributors)
 
 ## License
 
-This code is licensed under the [MIT license](http://choosealicense.com/licenses/mit/). 
+Copyright © [eXolnet](https://www.exolnet.com). All rights reserved.
+
+This code is licensed under the [MIT license](http://choosealicense.com/licenses/mit/).
 Please see the [license file](LICENSE) for more information.

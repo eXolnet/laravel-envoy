@@ -3,7 +3,6 @@
 namespace Exolnet\Envoy\Tests\Unit;
 
 use Exolnet\Envoy\ConfigDeploy;
-use PHPUnit\Framework\TestCase;
 
 class ConfigDeployTest extends TestCase
 {
