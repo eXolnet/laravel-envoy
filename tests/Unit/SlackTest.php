@@ -19,7 +19,6 @@ class SlackTest extends TestCase
 
     public function setUp(): void
     {
-//        $this->slack = new Slack(
         $this->slack = m::mock(Slack::class . '[makeClient]', [
             'TheHook',
             'TheChannel',

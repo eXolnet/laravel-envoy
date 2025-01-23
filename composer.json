@@ -38,6 +38,7 @@
         "exolnet/envoy": "^1.110.0"
     },
     "require-dev": {
+        "laravel/pint": "^1.20.0",
         "mockery/mockery": "^1.6.12",
         "phpunit/phpunit": "^10.5.41",
         "squizlabs/php_codesniffer": "^3.11.3"
@@ -53,8 +54,16 @@
         }
     },
     "scripts": {
-        "lint": "vendor/bin/phpcs -p --standard=PSR12 config src tests/Unit",
-        "lint:fix": "vendor/bin/phpcbf -p --standard=PSR12 config src tests/Unit",
+        "lint": [
+            "@lint:phpcs",
+            "@lint:pint"
+        ],
+        "lint:fix": [
+            "vendor/bin/phpcbf -p --standard=PSR12 config src tests/Unit",
+            "vendor/bin/pint"
+        ],
+        "lint:phpcs": "vendor/bin/phpcs -p --standard=PSR12 config src tests/Unit",
+        "lint:pint": "vendor/bin/pint --test",
         "test": "vendor/bin/phpunit",
         "test:coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
