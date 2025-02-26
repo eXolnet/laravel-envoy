@@ -7,6 +7,7 @@ use Exolnet\Envoy\ConfigEnvironment;
 use Exolnet\Envoy\Exceptions\EnvoyException;
 use Generator;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ConfigEnvironmentTest extends TestCase
 {
@@ -50,8 +51,8 @@ class ConfigEnvironmentTest extends TestCase
 
     /**
      * @return void
-     * @dataProvider provideTestBuildValidServerString
      */
+    #[DataProvider('provideTestBuildValidServerString')]
     public function testBuildValidServerString($host, $user, $options, $expected): void
     {
         $overwrites = [
@@ -81,8 +82,8 @@ class ConfigEnvironmentTest extends TestCase
 
     /**
      * @return void
-     * @dataProvider provideTestBuildInvalidServerString
      */
+    #[DataProvider('provideTestBuildInvalidServerString')]
     public function testBuildInvalidServerString($host, $user, $options): void
     {
         $this->expectException(EnvoyException::class);

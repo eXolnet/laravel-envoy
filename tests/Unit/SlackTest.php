@@ -33,7 +33,6 @@ class SlackTest extends TestCase
     }
 
     /**
-     * @test
      * @return void
      */
     public function testConstruct(): void
@@ -42,7 +41,6 @@ class SlackTest extends TestCase
     }
 
     /**
-     * @test
      * @return void
      */
     public function testConstructHookIsNull(): void
@@ -52,7 +50,6 @@ class SlackTest extends TestCase
     }
 
     /**
-     * @test
      * @return void
      */
     public function testMake(): void
@@ -74,7 +71,6 @@ class SlackTest extends TestCase
     }
 
     /**
-     * @test
      * @return void
      * @throws \ReflectionException
      */
@@ -121,7 +117,6 @@ class SlackTest extends TestCase
     }
 
     /**
-     * @test
      * @return void
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Exception

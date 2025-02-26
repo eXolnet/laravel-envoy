@@ -7,7 +7,6 @@ use Exolnet\Envoy\ConfigDeploy;
 class ConfigDeployTest extends TestCase
 {
     /**
-     * @test
      * @return void
      * @throws \Exception
      */
@@ -31,7 +30,6 @@ class ConfigDeployTest extends TestCase
     }
 
     /**
-     * @test
      * @return void
      */
     public function testGetName(): void
