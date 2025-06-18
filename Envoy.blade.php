@@ -276,8 +276,36 @@
     fi
 @endtask
 
+@task('deploy:sentryRelease')
+    cd "{{ $releasePath }}"
+
+    sentry_release="{{ $sentry_release }}"
+
+    if [ -z "${sentry_release}" ]; then
+        name="{{ $deploy->getName() }}"
+        commit="{{ $commit }}"
+        # Remove v prefix if it exists
+        if [[ "${commit}" == v* ]]; then
+            commit="${commit:1}"
+        fi
+        sentry_release="${name}@${commit}"
+    fi
+
+    echo "Setting Sentry release to: ${sentry_release}"
+
+    if [[ -f ".env" ]]; then
+        # If the variable exists, update it; otherwise, add it
+        grep -q "^SENTRY_RELEASE=" .env && sed -i "s/^SENTRY_RELEASE=.*/SENTRY_RELEASE=${sentry_release}/" .env || echo "SENTRY_RELEASE=${sentry_release}" >> .env
+        grep -q "^VITE_SENTRY_RELEASE=" .env && sed -i "s/^VITE_SENTRY_RELEASE=.*/VITE_SENTRY_RELEASE=${sentry_release}/" .env || echo "VITE_SENTRY_RELEASE=${sentry_release}" >> .env
+    else
+        # Create the file and add the variable
+        echo "SENTRY_RELEASE=${sentry_release}" > .env
+        echo "VITE_SENTRY_RELEASE=${sentry_release}" >> .env
+    fi
+@endtask
+
 @task('deploy:provisioned')
-    true
+    @run('deploy:sentryRelease')
 @endtask
 
 @task('deploy:building')
