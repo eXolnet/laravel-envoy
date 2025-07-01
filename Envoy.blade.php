@@ -4,6 +4,8 @@
     $deploy      = new Exolnet\Envoy\ConfigDeploy(get_defined_vars());
     $environment = $deploy->getEnvironment();
     extract($environment->extractVariables());
+
+    $dotenvVars = array_filter(explode(PHP_EOL, $dotenvVars ?? ''));
 @endsetup
 
 @servers(['web' => $serverString])
@@ -49,6 +51,7 @@
         deploy:git
         deploy:link
         deploy:copy
+        deploy:dotenv
         deploy:composer
         deploy:npm
     deploy:provisioned
@@ -80,6 +83,7 @@
         deploy:git
         deploy:link
         deploy:copy
+        deploy:dotenv
         deploy:composer
         deploy:npm
     deploy:provisioned
@@ -251,6 +255,21 @@
         if [ -f "{{ $currentPath }}/{{ $file }}" ]; then
             rsync -a "{{ $currentPath }}/{{ $file }}" "{{ $releasePath }}/{{ $file }}"
         fi
+    @endforeach
+@endtask
+
+@task('deploy:dotenv')
+    cd "{{ $releasePath }}"
+
+    @foreach($dotenvVars as $dotenvVar)
+        @php
+            [$dotenvVarName, $dotenvVarValue] = explode('=', $dotenvVar, 2);
+
+            $dotenvVarName = trim(escapeshellarg(trim($dotenvVarName)), '\'');
+            $dotenvVarValue = trim(escapeshellarg(trim($dotenvVarValue)), '\'');
+        @endphp
+
+        sed -i -E "s/^(#\\s*)?{{ $dotenvVarName }}=.*/{{ $dotenvVarName }}={{ $dotenvVarValue }}/" .env
     @endforeach
 @endtask
 
