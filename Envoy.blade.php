@@ -259,7 +259,7 @@
 @endtask
 
 @task('deploy:dotenv')
-    cd "{{ $releasePath }}"
+    cd "{{ $sharedPath }}"
 
     @foreach($dotenvVars as $dotenvVar)
         @php
