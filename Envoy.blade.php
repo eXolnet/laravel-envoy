@@ -306,7 +306,7 @@
 @task('deploy:build')
     cd "{{ $assetsPath }}"
 
-    if [ -f "package.json" ]; then
+    if [ -f "package.json" ] && jq -e '.scripts.production' package.json > /dev/null; then
         if [ -f "yarn.lock" ]; then
             {{ $cmdYarn }} run production
         else
