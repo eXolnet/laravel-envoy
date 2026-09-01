@@ -312,6 +312,12 @@
         else
             {{ $cmdNpm }} run production
         fi
+    elif [ -f "package.json" ] && jq -e '.scripts.build' package.json > /dev/null; then
+        if [ -f "yarn.lock" ]; then
+            {{ $cmdYarn }} run build
+        else
+            {{ $cmdNpm }} run build
+        fi
     fi
 @endtask
 
